@@ -1,5 +1,5 @@
+import 'package:freader/src/core/utils/annotation.dart';
 import 'package:meta/meta.dart';
-import 'package:sizzle_starter/src/core/utils/annotation.dart';
 
 @immutable
 @exception

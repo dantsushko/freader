@@ -1,7 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:sizzle_starter/src/core/utils/extensions/context_extension.dart';
-import 'package:sizzle_starter/src/feature/sample/localization/sample_localization_delegate.dart';
+import 'package:freader/src/core/router/router.gr.dart';
+import 'package:freader/src/core/utils/extensions/context_extension.dart';
+import 'package:freader/src/feature/sample/localization/sample_localization_delegate.dart';
 
 /// {@template sample_page}
 /// SamplePage widget
@@ -12,15 +13,18 @@ class SampleScreen extends StatelessWidget {
   const SampleScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text(context.stringOf<SampleStrings>().appTitle),
-        ),
-        body: Column(
-          children: [
-            Text(
-              context.stringOf<SampleStrings>().samplePlaceholder('Misha'),
-            ),
+  Widget build(BuildContext context) => AutoTabsScaffold(
+        routes: const [ReadingRoute(), LibraryRoute(), CataloguesRoute(), SettingsRoute()],
+        bottomNavigationBuilder: (_, tabsRouter) => BottomNavigationBar(
+          currentIndex: tabsRouter.activeIndex,
+          onTap: tabsRouter.setActiveIndex,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            
+            BottomNavigationBarItem(label: 'Reading', icon: Icon(Icons.book)),
+            BottomNavigationBarItem(label: 'Library', icon: Icon(Icons.shelves)),
+            BottomNavigationBarItem(label: 'Catalogues', icon: Icon(Icons.public)),
+            BottomNavigationBarItem(label: 'Settings', icon: Icon(Icons.settings)),
           ],
         ),
       );

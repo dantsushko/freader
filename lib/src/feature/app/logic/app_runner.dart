@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:sizzle_starter/src/core/utils/logger.dart';
-import 'package:sizzle_starter/src/feature/app/widget/app.dart';
-import 'package:sizzle_starter/src/feature/initialization/logic/initialization_processor.dart';
-import 'package:sizzle_starter/src/feature/initialization/logic/initialization_steps.dart';
-import 'package:sizzle_starter/src/feature/initialization/model/initialization_hook.dart';
+import 'package:freader/src/core/utils/logger.dart';
+import 'package:freader/src/feature/app/widget/app.dart';
+import 'package:freader/src/feature/initialization/logic/initialization_processor.dart';
+import 'package:freader/src/feature/initialization/logic/initialization_steps.dart';
+import 'package:freader/src/feature/initialization/model/initialization_hook.dart';
 
 /// A class which is responsible for initialization and running the app.
 class AppRunner with InitializationSteps, InitializationProcessor, InitializationFactoryImpl {
