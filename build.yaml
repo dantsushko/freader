@@ -1,6 +1,16 @@
 targets:
   $default:
-    builders:
+    builders:      
+      # auto_route_generator:auto_route_generator: # this for @RoutePage
+      #   options:
+      #     enable_cached_builds: true
+      #   generate_for:
+      #     - lib/src/feature/**_screen.dart
+      # auto_route_generator:auto_router_generator: # this for @AutoRouterConfig
+      #   options:
+      #     enable_cached_builds: true
+      #   generate_for:
+      #     - lib/src/core/router/router.dart 
       json_serializable:
         enabled: true
         generate_for:

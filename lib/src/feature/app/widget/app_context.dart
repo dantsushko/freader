@@ -10,6 +10,7 @@ class AppContext extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = DependenciesScope.dependenciesOf(context).router;
+    
     return MaterialApp.router(
       routerConfig: router.config(),
       debugShowCheckedModeBanner: false,

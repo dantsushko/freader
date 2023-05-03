@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/generated_localizations.dart';
 import 'package:freader/src/core/localization/localization_delegate.dart';
-import 'package:freader/src/feature/sample/localization/sample_localization_delegate.dart';
+import 'package:freader/src/feature/base/localization/sample_localization_delegate.dart';
 
 typedef GeneratedLocalization = GeneratedLocalizations;
 

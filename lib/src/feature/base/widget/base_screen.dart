@@ -1,16 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:freader/src/core/router/router.gr.dart';
-import 'package:freader/src/core/utils/extensions/context_extension.dart';
-import 'package:freader/src/feature/sample/localization/sample_localization_delegate.dart';
 
-/// {@template sample_page}
-/// SamplePage widget
-/// {@endtemplate}
 @RoutePage()
-class SampleScreen extends StatelessWidget {
-  /// {@macro sample_page}
-  const SampleScreen({super.key});
+class BaseScreen extends StatelessWidget {
+  const BaseScreen({super.key});
 
   @override
   Widget build(BuildContext context) => AutoTabsScaffold(
