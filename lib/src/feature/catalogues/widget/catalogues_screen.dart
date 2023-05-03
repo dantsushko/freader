@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:freader/src/core/data/database/tables.dart';
+import 'package:freader/src/core/router/router.gr.dart';
 import 'package:freader/src/feature/catalogues/widget/catalogue_icon.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
@@ -38,8 +38,6 @@ class _CataloguesScreenState extends State<CataloguesScreen> {
       ),
       items: items,
     );
-
-  
   }
 
   @override
@@ -65,29 +63,37 @@ class _CataloguesScreenState extends State<CataloguesScreen> {
                 List<Widget> gridChildren = snapshot.data!
                     .map(
                       (opds) => GestureDetector(
-                        onTapDown: _getTapPosition,
+                        onTapDown: (details) {
+                          _getTapPosition(details);
+                          context.router.push(OpdsRoute(url: opds.url, name: opds.name));
+                        },
                         onLongPress: () => _showContextMenu(context, [
                           PopupMenuItem(
-                            child: Text('Правка'),
+                            child: const Text('Правка'),
                             onTap: () => print('asd'),
                           ),
                           PopupMenuItem(
-                            child: Text('Удалить'),
-                            onTap: () => DependenciesScope.dependenciesOf(context).database.opdsDao.deleteOpds(opds.id),
+                            child: const Text('Удалить'),
+                            onTap: () => DependenciesScope.dependenciesOf(context)
+                                .database
+                                .opdsDao
+                                .deleteOpds(opds.id),
                           ),
                         ]),
                         child: CatalogueIcon(name: opds.name),
                       ),
                     )
                     .toList();
-                    gridChildren = [...gridChildren, GestureDetector(
-                      onTap: () => showDialog<void>(
-                        context: context,
-                        builder: (ctx) => const CustomDialog(),
-                      ),
-                      child: const AddCatalogueIcon(),
-                    )];
-
+                gridChildren = [
+                  ...gridChildren,
+                  GestureDetector(
+                    onTap: () => showDialog<void>(
+                      context: context,
+                      builder: (ctx) => const CustomDialog(),
+                    ),
+                    child: const AddCatalogueIcon(),
+                  )
+                ];
 
                 return SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
