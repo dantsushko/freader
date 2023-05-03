@@ -24,7 +24,7 @@ class AppLocalization {
 
   /// Feature localization delegates
   static final featureDelegates = <LocalizationDelegate<Object>>[
-    SampleLocalizationDelegate(),
+    BaseLocalizationDelegate(),
   ];
 
   /// Returns the localized strings for the given [context].

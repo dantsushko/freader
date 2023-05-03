@@ -1,3 +1,4 @@
+import 'package:freader/src/core/data/database/database.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:freader/src/core/router/router.dart';
@@ -14,6 +15,7 @@ class DependenciesStore with _$DependenciesStore {
   const factory DependenciesStore({
     required SharedPreferences preferences,
     required AppRouter router,
+    required AppDatabase database,
   }) = _DependenciesStore;
 
   const DependenciesStore._();
@@ -24,12 +26,14 @@ class InitializationProgress with _$InitializationProgress {
   const factory InitializationProgress({
     SharedPreferences? preferences,
     AppRouter? router,
+    AppDatabase? database,
   }) = _InitializationProgress;
 
   const InitializationProgress._();
 
   DependenciesStore dependencies() => DependenciesStore(
         preferences: preferences!,
+        database: database!,
         router: router!,
       );
 

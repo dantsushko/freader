@@ -1,5 +1,7 @@
 include: package:sizzle_lints/sizzle_lints.yaml
 
 analyzer: 
+  errors:
+    always_use_package_imports: false
   exclude: 
     - "lib/src/core/localization/generated/**"

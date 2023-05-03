@@ -1,18 +1,18 @@
 import 'package:freader/src/core/localization/app_localization.dart';
 import 'package:freader/src/core/localization/localization_delegate.dart';
 
-abstract class SampleStrings {
+abstract class BaseStrings {
   String get appTitle;
 
   String samplePlaceholder(String value);
 }
 
-class SampleLocalizationDelegate extends LocalizationDelegate<SampleStrings> {
-  SampleLocalizationDelegate() : super(_SampleStringsImpl.new);
+class BaseLocalizationDelegate extends LocalizationDelegate<BaseStrings> {
+  BaseLocalizationDelegate() : super(_BaseStringsImpl.new);
 }
 
-class _SampleStringsImpl implements SampleStrings {
-  _SampleStringsImpl(this._appLocalizations);
+class _BaseStringsImpl implements BaseStrings {
+  _BaseStringsImpl(this._appLocalizations);
 
   final GeneratedLocalization _appLocalizations;
 

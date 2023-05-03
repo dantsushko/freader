@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:freader/src/core/data/database/database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:freader/src/core/router/router.dart';
 import 'package:freader/src/feature/initialization/model/initialization_progress.dart';
@@ -23,6 +24,12 @@ mixin InitializationSteps {
       final router = AppRouter();
       return progress.copyWith(
         router: router,
+      );
+    },
+        'Init Database': (progress) async{
+      final database =  AppDatabase();
+      return progress.copyWith(
+        database: database,
       );
     }
   };
