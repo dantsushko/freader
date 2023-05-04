@@ -4,6 +4,7 @@ import 'package:freader/src/core/router/router.gr.dart';
 import 'package:freader/src/feature/catalogues/widget/catalogue_icon.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
+import '../../../core/utils/mixin/context_menu_mixin.dart';
 import 'add_opds_dialog.dart';
 
 @RoutePage()
@@ -14,31 +15,31 @@ class CataloguesScreen extends StatefulWidget {
   State<CataloguesScreen> createState() => _CataloguesScreenState();
 }
 
-class _CataloguesScreenState extends State<CataloguesScreen> {
+class _CataloguesScreenState extends State<CataloguesScreen> with ContextMenuMixin{
   @override
   void initState() {
     super.initState();
   }
 
-  Offset _tapPosition = Offset.zero;
-  void _getTapPosition(TapDownDetails details) {
-    final referenceBox = context.findRenderObject() as RenderBox?;
-    setState(() {
-      _tapPosition = referenceBox!.globalToLocal(details.globalPosition);
-    });
-  }
+  // Offset _tapPosition = Offset.zero;
+  // void _getTapPosition(TapDownDetails details) {
+  //   final referenceBox = context.findRenderObject() as RenderBox?;
+  //   setState(() {
+  //     _tapPosition = referenceBox!.globalToLocal(details.globalPosition);
+  //   });
+  // }
 
-  Future<void> _showContextMenu(BuildContext context, List<PopupMenuItem> items) async {
-    final overlay = Overlay.of(context).context.findRenderObject();
-    await showMenu(
-      context: context,
-      position: RelativeRect.fromRect(
-        Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
-        Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width, overlay.paintBounds.size.height),
-      ),
-      items: items,
-    );
-  }
+  // Future<void> _showContextMenu(BuildContext context, List<PopupMenuItem> items) async {
+  //   final overlay = Overlay.of(context).context.findRenderObject();
+  //   await showMenu(
+  //     context: context,
+  //     position: RelativeRect.fromRect(
+  //       Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
+  //       Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width, overlay.paintBounds.size.height),
+  //     ),
+  //     items: items,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -63,11 +64,9 @@ class _CataloguesScreenState extends State<CataloguesScreen> {
                 List<Widget> gridChildren = snapshot.data!
                     .map(
                       (opds) => GestureDetector(
-                        onTapDown: (details) {
-                          _getTapPosition(details);
-                          context.router.push(OpdsRoute(url: opds.url, name: opds.name));
-                        },
-                        onLongPress: () => _showContextMenu(context, [
+                        onTapDown: getTapPosition,
+                        onTapUp: (details) => context.router.push(OpdsRoute(url: opds.url, name: opds.name)),
+                        onLongPress: () => showContextMenu(context, [
                           PopupMenuItem(
                             child: const Text('Правка'),
                             onTap: () => print('asd'),

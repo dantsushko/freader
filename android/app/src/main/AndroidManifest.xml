@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.freader.freader">
-   <application
+    <application
         android:label="freader"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
