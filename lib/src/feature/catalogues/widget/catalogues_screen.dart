@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:freader/src/core/router/router.gr.dart';
-import 'package:freader/src/feature/catalogues/widget/catalogue_icon.dart';
+import 'package:freader/src/feature/base/widget/catalogue_icon.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
 import '../../../core/utils/mixin/context_menu_mixin.dart';

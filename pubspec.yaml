@@ -9,20 +9,25 @@ version: 0.0.1+1
 environment:
   sdk: ">=2.19.0 <3.0.0"
   flutter: ">=3.7.0 <4.0.0"
-
+dependency_overrides:
+  xml: ^5.3.1
+  image: ^3.0.8
 dependencies:
-  al_downloader: ^1.7.3
+  archive: ^3.3.7
   async: 2.10.0
   auto_route: ^6.4.0
   collection: 1.17.0
   drift: ^2.5.0
+  epubx: ^3.0.0
   firebase_analytics: ^10.1.5
   firebase_core: ^2.7.0
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.2
+  flutter_downloader: ^1.10.2
   flutter_localizations:
     sdk: flutter
+  flutter_sharing_intent: ^1.0.6
   flutter_widget_from_html: ^0.10.0
   freezed_annotation: 2.2.0
   http: 0.13.5
@@ -43,7 +48,10 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.13
   stack_trace: 1.11.0
   stream_transform: 2.1.0
+  translator: ^0.1.7
+  watcher: ^1.0.2
   xml: any
+  flutter_html: 3.0.0-alpha.6
 
 dev_dependencies:
   auto_route_generator: ^6.0.3

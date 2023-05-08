@@ -13,9 +13,18 @@ class AppRouter extends $AppRouter {
           initial: true,
           path: '/',
           children: [
+            
             AutoRoute(page: ReadingRoute.page, path: 'reading'),
-            AutoRoute(page: LibraryRoute.page, path: 'library'),
+            AutoRoute(page: LibraryTab.page, path: 'library',
+            children: [
+              AutoRoute(page: LibraryRoute.page, path: ''),
+              AutoRoute(page: DirectoryContentRoute.page, path: 'directory'),
+              CustomRoute(
+                transitionsBuilder: TransitionsBuilders.fadeIn,
+                page: BookReadingRoute.page, path: 'book_reading'),
+            ],),
             AutoRoute(
+              
               page: CataloguesTab.page,
               path: 'catalogues',
               children: [
@@ -44,4 +53,8 @@ class SettingsTabPage extends AutoRouter {
 @RoutePage(name: 'CataloguesTab')
 class CataloguesTabPage extends AutoRouter {
   const CataloguesTabPage({super.key});
+}
+@RoutePage(name: 'LibraryTab')
+class LibraryTabPage extends AutoRouter {
+  const LibraryTabPage({super.key});
 }

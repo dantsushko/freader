@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 import 'package:freader/src/core/utils/mixin/scope_mixin.dart';
+import 'package:meta/meta.dart';
 
 typedef BuildScope<T extends Widget> = ScopeMixin<T> Function(Widget child);
 

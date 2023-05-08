@@ -31,6 +31,7 @@ class _OpdsScreenState extends State<OpdsScreen> {
         body: FutureBuilder<String>(
           future: getContent(),
           builder: (context, snapshot) {
+            if (snapshot.hasError) return Center(child: Text(snapshot.error.toString()));
             if (!snapshot.hasData) {
               return const Center(
                 child: CircularProgressIndicator(),

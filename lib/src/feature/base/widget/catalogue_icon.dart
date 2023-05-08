@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 class CatalogueIcon extends StatelessWidget {
   const CatalogueIcon({
     required this.name,
+    this.icon,
     super.key,
   });
   final String name;
-
+  final IconData? icon;
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.all(8),
@@ -19,8 +20,8 @@ class CatalogueIcon extends StatelessWidget {
                 color: Colors.brown[800],
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.camera,
+              child:  Icon(
+                icon ?? Icons.camera,
                 color: Colors.white,
                 size: 32,
               ),
@@ -40,7 +41,7 @@ class CatalogueIcon extends StatelessWidget {
       );
 }
 
-class AddCatalogueIcon extends StatelessWidget{
+class AddCatalogueIcon extends StatelessWidget {
   const AddCatalogueIcon({
     super.key,
   });
