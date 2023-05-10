@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 Future<String> getDir([List<String> pathSegments = const []]) async {
   final absoulte = Platform.isIOS
       ? (await getApplicationDocumentsDirectory()).absolute
-      : (await getExternalStorageDirectory())!.absolute;
+      : (await getApplicationDocumentsDirectory()).absolute;
   final dir = Directory(path.joinAll([absoulte.path, ...pathSegments]));
   if (!dir.existsSync()) {
     dir.createSync(recursive: true);

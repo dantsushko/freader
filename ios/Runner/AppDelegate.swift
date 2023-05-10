@@ -1,7 +1,6 @@
 import UIKit
 import Flutter
 import flutter_sharing_intent
-import flutter_downloader
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
   override func application(
@@ -9,7 +8,6 @@ import flutter_downloader
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
-     FlutterDownloaderPlugin.setPluginRegistrantCallback(registerPlugins)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   } 
 
@@ -25,9 +23,4 @@ import flutter_downloader
      // Proceed url handling for other Flutter libraries like uni_links
      return super.application(app, open: url, options:options)
    }
-}
-private func registerPlugins(registry: FlutterPluginRegistry) {
-    if (!registry.hasPlugin("FlutterDownloaderPlugin")) {
-       FlutterDownloaderPlugin.register(with: registry.registrar(forPlugin: "FlutterDownloaderPlugin")!)
-    }
 }

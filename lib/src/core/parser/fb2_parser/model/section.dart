@@ -1,9 +1,6 @@
-class FB2Section {
-  late final String? title;
-  late final String? content;
+import 'package:xml/xml.dart';
 
-  FB2Section(String? content) {
-    this.content = content;
-    title = RegExp(r"<title>([\s\S]+?)<\/title>").firstMatch(content ?? '')?.group(1);
-  }
+class FB2Section {
+  FB2Section(this.content);
+  late final XmlElement content;
 }

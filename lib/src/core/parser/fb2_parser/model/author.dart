@@ -1,3 +1,5 @@
+import 'package:xml/xml.dart';
+
 class FB2Author {
   /// author's first name
   late final String? firstName;
@@ -14,12 +16,13 @@ class FB2Author {
   /// author's email
   late final String? email;
 
-  FB2Author(String author) {
-    firstName = RegExp(r"<first-name>([\s\S]+)<\/first-name>").firstMatch(author)?.group(1);
-    middleName = RegExp(r"<middle-name>([\s\S]+)<\/middle-name>").firstMatch(author)?.group(1);
-    lastName = RegExp(r"<last-name>([\s\S]+)<\/last-name>").firstMatch(author)?.group(1);
-    nickname = RegExp(r"<nickname>([\s\S]+)<\/nickname>").firstMatch(author)?.group(1);
-    email = RegExp(r"<email>([\s\S]+)<\/email>").firstMatch(author)?.group(1);
+  FB2Author(XmlElement author) {
+    firstName = author.getElement('first-name')?.innerText;
+    middleName = author.getElement('middle-name')?.innerText;
+    lastName = author.getElement('last-name')?.innerText;
+    nickname = author.getElement('nickname')?.innerText;
+    email = author.getElement('email')?.innerText;
+    
   }
 
   @override

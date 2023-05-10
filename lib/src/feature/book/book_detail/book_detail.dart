@@ -8,11 +8,8 @@ import 'package:freader/src/core/data/database/daos/book_dao.dart';
 import 'package:freader/src/core/utils/downloader.dart';
 import 'package:freader/src/feature/catalogues/opds/model/opds_entry.model.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
-import 'package:freader/src/feature/reading/widget/reading_screen.dart';
 
-import '../../../core/parser/parser.dart';
 import '../../../core/router/router.gr.dart';
-import '../book_reading_screen.dart';
 
 class BookDetailScreen extends StatefulWidget {
   const BookDetailScreen({super.key, this.opdsEntry, this.book})
@@ -26,7 +23,7 @@ class BookDetailScreen extends StatefulWidget {
 class _BookDetailScreenState extends State<BookDetailScreen> {
   late final Downloader downloader;
   DownloadStatus? status;
-  StreamSubscription<DownloadStatus?>? downloadProgressSubscription;
+  StreamSubscription<DownloadStatus>? downloadProgressSubscription;
   late BookWithMetadata? book;
   late final OpdsEntry? opdsEntry;
   @override
@@ -78,7 +75,7 @@ class BookColumn extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Image.memory(
-            base64Decode(bookWithMetadata.book.cover!.replaceAll(RegExp(r'\s+'), '')),
+          bookWithMetadata.book.cover!,
             fit: BoxFit.contain,
             errorBuilder: (ctx, _, __) => SizedBox.shrink(),
           ),
@@ -123,7 +120,7 @@ class OpdsColumn extends StatelessWidget {
             )
           else
             const SizedBox.shrink(),
-          if (status == null)
+          if (status?.status != DownloadState.downloading)
             ElevatedButton(
               onPressed: opdsEntry!.download != null
                   ? () async {
@@ -135,7 +132,7 @@ class OpdsColumn extends StatelessWidget {
           else
             ElevatedButton(
               onPressed: downloader.cancelDownload,
-              child: Text('Загружается: ${status!.percentage}%'),
+              child: Text('Загружается: ${(status!.percentage * 100).toStringAsFixed(2)}%'),
             ),
           Row(
             children: [
@@ -156,7 +153,7 @@ class OpdsColumn extends StatelessWidget {
                       .map(
                         (e) => Row(
                           children: [
-                            Expanded(child: Text(e.name)),
+                            Expanded(child: Text(e.name!)),
                           ],
                         ),
                       )
@@ -165,7 +162,7 @@ class OpdsColumn extends StatelessWidget {
               ),
             ],
           ),
-          HtmlWidget(opdsEntry!.content)
+          HtmlWidget(opdsEntry!.content!)
         ],
       );
 }

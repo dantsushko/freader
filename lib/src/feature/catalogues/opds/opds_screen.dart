@@ -17,10 +17,7 @@ class OpdsScreen extends StatefulWidget {
 }
 
 class _OpdsScreenState extends State<OpdsScreen> {
-  Future<String> getContent() async {
-    final content = await http.get(Uri.parse(widget.url));
-    return content.body;
-  }
+
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -28,17 +25,6 @@ class _OpdsScreenState extends State<OpdsScreen> {
           title: Text(widget.name),
           centerTitle: true,
         ),
-        body: FutureBuilder<String>(
-          future: getContent(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) return Center(child: Text(snapshot.error.toString()));
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            return OpdsViewer(content: snapshot.data!, uri: Uri.parse(widget.url));
-          },
-        ),
+        body:  OpdsViewer( uri: Uri.parse(widget.url)),
       );
 }

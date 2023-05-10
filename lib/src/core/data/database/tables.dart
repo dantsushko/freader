@@ -38,7 +38,7 @@ class BookEntries extends Table {
   TextColumn get format => text()();
   RealColumn get timestamp => real()();
   TextColumn get directory => text().nullable()();
-  TextColumn get cover => text().nullable()();
+  BlobColumn get cover => blob().nullable()();
 }
 
 @DataClassName('FileEntry')

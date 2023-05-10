@@ -4,8 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:freader/src/core/data/database/daos/book_dao.dart';
+import 'package:freader/src/core/parser/fb2_parser/model/section.dart';
 import 'package:freader/src/core/parser/parser.dart';
 import 'package:freader/src/feature/app/widget/app.dart';
+import 'package:freader/src/feature/catalogues/opds/util.dart';
+
+import 'fb2/fb2_screen.dart';
 
 @RoutePage()
 class BookReadingScreen extends StatefulWidget {
@@ -30,12 +34,10 @@ class _ReadingScreenState extends State<BookReadingScreen> {
     } else {
       // Center tapped
       print('Center tapped');
-        setState(() {
-          _showAppBar = !_showAppBar;
-          initAppBar(); // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
-        });
-    
-     
+      setState(() {
+        _showAppBar = !_showAppBar;
+        initAppBar(); // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
+      });
     }
   }
 
@@ -47,13 +49,12 @@ class _ReadingScreenState extends State<BookReadingScreen> {
     }
   }
 
-  
+  BookFormat format = BookFormat.unsupported;
   @override
   void initState() {
     initAppBar();
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) => SafeArea(
@@ -111,26 +112,8 @@ class _ReadingScreenState extends State<BookReadingScreen> {
                     }
                     if (snapshot.hasData) {
                       final book = snapshot.data!;
-                      return ListView(
-                        children: [
-                          Center(
-                              child: Text(
-                            book.title,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          )),
-                          if (book.fb2body != null) Text(book.fb2body!.epigraph ?? ''),
-                          ...book.fb2body!.sections!
-                              .map((e) => Column(
-                                    children: [
-                                      SelectableHtml(data: e.title ?? ''),
-                                      SelectableHtml(
-                                        data: e.content ?? '',
-                                      ),
-                                    ],
-                                  ))
-                              .toList(),
-                        ],
-                      );
+
+                      return Screen(book: book);
                     }
                     return const Center(child: CircularProgressIndicator());
                   },
@@ -170,4 +153,48 @@ class _ReadingScreenState extends State<BookReadingScreen> {
           ),
         ),
       );
+}
+
+class Screen extends StatelessWidget {
+  const Screen({
+    super.key,
+    required this.book,
+  });
+
+  final CommonBook book;
+
+  @override
+  Widget build(BuildContext context) {
+    if (book.fb2book != null) {
+      return FB2Screen(book: book.fb2book!);
+    }
+    if (book.epubBook != null) {
+      return ListView(
+        children: [
+          Center(
+            child: Text(
+              book.title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+
+          ...book.epubBook!.Content?.Html?.values
+                  .map((e) => SelectableHtml(data: e.Content ?? '')) ??
+              []
+          // SelectableHtml(data: book.epubBook!.Content?.Html.values.first.Content ?? ''),
+          // ...book.fb2body!.sections!.map(
+          //   (e) => Column(
+          //     children: [
+          //       SelectableHtml(data: e.title ?? ''),
+          //       SelectableHtml(
+          //         data: e.epubBook.c ?? '',
+          //       ),
+          //     ],
+          //   ),
+          // ),
+        ],
+      );
+    }
+    return const Center(child: Text('Unsupported format'));
+  }
 }

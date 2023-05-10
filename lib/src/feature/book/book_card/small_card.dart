@@ -32,7 +32,7 @@ class SmallCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(2),
                     child: Image.memory(
-                      base64Decode(entity.book.cover!.replaceAll(RegExp(r'\s+'), '')),
+                      entity.book.cover!,
                       cacheWidth: 50,
                       cacheHeight: 75,
                       errorBuilder: (ctx, _, __) => Image.asset(

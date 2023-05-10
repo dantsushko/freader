@@ -1,0 +1,3 @@
+class FB2PublishInfo{
+  
+}

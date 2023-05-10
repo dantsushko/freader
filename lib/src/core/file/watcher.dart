@@ -16,16 +16,12 @@ List<String> dirsToWatch = [
 
 class FileWatcher {
   Future<void> onEvent(WatchEvent event, String dir) async {
-    if (getDirName(event.path) != getDirName(dir)) {
-      print('Skippinkg dir ${getDirName(event.path)} because listens to ${getDirName(dir)}');
-      return;
-    }
-    print(event);
+    l.i(event);
     if (event.type == ChangeType.ADD) {
       if (isBook(event.path)) {
         final parsedBook = await Parser().parse(event.path);
         if (parsedBook != null) {
-          print('importing book');
+          l.i('importing book');
           await db.bookDao.importBook(parsedBook);
         } else {
           File(event.path).deleteSync();
@@ -41,7 +37,6 @@ class FileWatcher {
   }
 
   FileWatcher(this.db) {
-    print(dirsToWatch);
     for (final dir in dirsToWatch) {
       subscriptions.add(Watcher(dir, pollingDelay: const Duration(seconds: 3))
           .events
