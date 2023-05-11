@@ -18,10 +18,15 @@ class SmallCard extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
         height: 60,
         child: InkWell(
-          onTap: () => showBottomSheet<void>(
+          onTap: () => showModalBottomSheet<void>(
               context: context,
-              builder: (ctx) => BookDetailScreen(
-                    book: entity,
+              useRootNavigator: true,
+              isScrollControlled: true,
+              builder: (ctx) => SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.9,
+                    child: BookDetailScreen(
+                      book: entity,
+                    ),
                   )),
           child: Card(
             child: Row(

@@ -25,13 +25,13 @@ class _FB2ScreenState extends State<FB2Screen> {
 
     for (final node in element.children) {
       if (node is XmlText) {
-        textSpans.add(TextSpan(text: node.toString(), style: const TextStyle(color: Colors.black)));
+        textSpans.add(TextSpan(text: node.toString()));
       } else if (node is XmlElement) {
         if (node.name.local == 'emphasis') {
           textSpans.add(
             TextSpan(
               text: node.innerText,
-              style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.black),
+              style: const TextStyle(fontStyle: FontStyle.italic),
             ),
           );
         } else if (node.name.local == 'a') {
@@ -49,7 +49,7 @@ class _FB2ScreenState extends State<FB2Screen> {
                   richMessage: TextSpan(children: [TextSpan(text: link?.text ?? 'Link')]),
                   child: Text(
                     node.innerText,
-                    style: const TextStyle(decoration: TextDecoration.underline, color: Colors.red),
+                    style: TextStyle(decoration: TextDecoration.underline, color: Theme.of(context).primaryColor),
                   ),),
             ),
           );

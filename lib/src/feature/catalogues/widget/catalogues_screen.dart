@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:freader/src/core/router/router.gr.dart';
 import 'package:freader/src/feature/base/widget/catalogue_icon.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
@@ -15,7 +17,7 @@ class CataloguesScreen extends StatefulWidget {
   State<CataloguesScreen> createState() => _CataloguesScreenState();
 }
 
-class _CataloguesScreenState extends State<CataloguesScreen> with ContextMenuMixin{
+class _CataloguesScreenState extends State<CataloguesScreen> with ContextMenuMixin {
   @override
   void initState() {
     super.initState();
@@ -42,69 +44,58 @@ class _CataloguesScreenState extends State<CataloguesScreen> with ContextMenuMix
   // }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            const SliverAppBar(
-              snap: true,
-              floating: true,
-              expandedHeight: 40,
-              title: Text('Каталоги'),
-              centerTitle: true,
-            ),
-            StreamBuilder(
-              stream: DependenciesScope.dependenciesOf(context).database.opdsDao.watchAll(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const SliverToBoxAdapter(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
+  Widget build(BuildContext context) => PlatformScaffold(
+      appBar: PlatformAppBar(title: const Text('Каталоги'),),
+      body: StreamBuilder(
+        stream: DependenciesScope.dependenciesOf(context).database.opdsDao.watchAll(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                List<Widget> gridChildren = snapshot.data!
-                    .map(
-                      (opds) => GestureDetector(
-                        onTapDown: getTapPosition,
-                        onTapUp: (details) => context.router.push(OpdsRoute(url: opds.url, name: opds.name)),
-                        onLongPress: () => showContextMenu(context, [
-                          PopupMenuItem(
-                            child: const Text('Правка'),
-                            onTap: () => print('asd'),
-                          ),
-                          PopupMenuItem(
-                            child: const Text('Удалить'),
-                            onTap: () => DependenciesScope.dependenciesOf(context)
-                                .database
-                                .opdsDao
-                                .deleteOpds(opds.id),
-                          ),
-                        ]),
-                        child: CatalogueIcon(name: opds.name),
-                      ),
-                    )
-                    .toList();
-                gridChildren = [
-                  ...gridChildren,
-                  GestureDetector(
-                    onTap: () => showDialog<void>(
-                      context: context,
-                      builder: (ctx) => const CustomDialog(),
+          List<Widget> gridChildren = snapshot.data!
+              .map(
+                (opds) => GestureDetector(
+                  onTapDown: getTapPosition,
+                  onTapUp: (details) =>
+                      context.router.push(OpdsRoute(url: opds.url, name: opds.name)),
+                  onLongPress: () => showContextMenu(context, [
+                    PopupMenuItem(
+                      child: const Text('Правка'),
+                      onTap: () => print('asd'),
                     ),
-                    child: const AddCatalogueIcon(),
-                  )
-                ];
+                    PopupMenuItem(
+                      child: const Text('Удалить'),
+                      onTap: () => DependenciesScope.dependenciesOf(context)
+                          .database
+                          .opdsDao
+                          .deleteOpds(opds.id),
+                    ),
+                  ]),
+                  child: CatalogueIcon(name: opds.name),
+                ),
+              )
+              .toList();
+          gridChildren = [
+            ...gridChildren,
+            GestureDetector(
+              onTap: () => showDialog<void>(
+                context: context,
+                builder: (ctx) => const CustomDialog(),
+              ),
+              child: const AddCatalogueIcon(),
+            )
+          ];
 
-                return SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                  ),
-                  delegate: SliverChildListDelegate(gridChildren),
-                );
-              },
+          return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
             ),
-          ],
-        ),
-      );
+            itemCount: gridChildren.length,
+            itemBuilder: (context, index) => gridChildren[index],
+          );
+        },
+      ));
 }

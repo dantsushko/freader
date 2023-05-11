@@ -26,11 +26,15 @@ class OpdsCard extends StatelessWidget {
         ),
       );
     } else {
-      showBottomSheet<void>(
+      showModalBottomSheet<void>(
         context: context,
-        builder: (ctx) => BookDetailScreen(
-          key: ValueKey(entry),
-          opdsEntry: entry,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        builder: (ctx) => SizedBox(
+          height: MediaQuery.of(context).size.height * 0.9,
+          child: BookDetailScreen(
+            opdsEntry: entry,
+          ),
         ),
       );
     }

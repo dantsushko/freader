@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:freader/src/core/data/database/daos/book_dao.dart';
@@ -63,43 +64,40 @@ class _ReadingScreenState extends State<BookReadingScreen> {
           builder: (context, snapshot) => GestureDetector(
             // onTapDown: handleTap,
             onDoubleTapDown: handleTap,
-            child: Scaffold(
+            child: PlatformScaffold(
               appBar: _showAppBar
-                  ? PreferredSize(
-                      preferredSize: const Size.fromHeight(30),
-                      child: AppBar(
-                        centerTitle: true,
+                  ? PlatformAppBar(
+                        // centerTitle: true,
                         title: Text(
                           snapshot.data?.title ?? '',
-                          style: const TextStyle(color: Colors.black87, fontSize: 13),
                         ),
-                        backgroundColor: Colors.white,
-                        elevation: 0,
-                        leading: InkWell(
-                          onTap: () => context.router.pop(),
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        actions: const [
-                          Padding(
-                            padding: EdgeInsets.all(4),
-                            child: Icon(
-                              Icons.settings,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(4),
-                            child: Icon(
-                              Icons.menu_book_sharp,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
+                        // backgroundColor: Colors.white,
+                        // elevation: 0,
+                        // leading: InkWell(
+                        //   onTap: () => context.router.pop(),
+                        //   child: const Icon(
+                        //     Icons.close,
+                        //     color: Colors.black87,
+                        //   ),
+                        // ),
+                        // actions: const [
+                        //   Padding(
+                        //     padding: EdgeInsets.all(4),
+                        //     child: Icon(
+                        //       Icons.settings,
+                        //       color: Colors.black87,
+                        //     ),
+                        //   ),
+                        //   Padding(
+                        //     padding: EdgeInsets.all(4),
+                        //     child: Icon(
+                        //       Icons.menu_book_sharp,
+                        //       color: Colors.black87,
+                        //     ),
+                        //   ),
+                        // ],
+                      )
+                    
                   : null,
               body: Padding(
                 padding: const EdgeInsets.all(8),
@@ -119,36 +117,6 @@ class _ReadingScreenState extends State<BookReadingScreen> {
                   },
                 ),
               ),
-              // child: FutureBuilder<CommonBook?>(
-              //       future: Parser().parse(widget.bookWithMetadata.book.filepath),
-              //       builder: (context, snapshot) {
-              //         if (snapshot.hasError) {
-              //           return Center(child: Text(snapshot.error.toString()));
-              //         }
-              //         if (snapshot.hasData) {
-              //           final book = snapshot.data!;
-              //           return ListView(
-              //             children: [
-              //               Center(
-              //                   child: Text(
-              //                 book.title,
-              //                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              //               )),
-              //               if (book.fb2body != null) Text(book.fb2body!.epigraph ?? ''),
-              //               ...book.fb2body!.sections!
-              //                   .map((e) => Column(
-              //                         children: [
-              //                           HtmlWidget(e.title ?? ''),
-              //                           HtmlWidget(e.content ?? ''),
-              //                         ],
-              //                       ))
-              //                   .toList(),
-              //             ],
-              //           );
-              //         }
-              //         return const Center(child: CircularProgressIndicator());
-              //       },
-              //     ),
             ),
           ),
         ),
@@ -181,17 +149,6 @@ class Screen extends StatelessWidget {
           ...book.epubBook!.Content?.Html?.values
                   .map((e) => SelectableHtml(data: e.Content ?? '')) ??
               []
-          // SelectableHtml(data: book.epubBook!.Content?.Html.values.first.Content ?? ''),
-          // ...book.fb2body!.sections!.map(
-          //   (e) => Column(
-          //     children: [
-          //       SelectableHtml(data: e.title ?? ''),
-          //       SelectableHtml(
-          //         data: e.epubBook.c ?? '',
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ],
       );
     }

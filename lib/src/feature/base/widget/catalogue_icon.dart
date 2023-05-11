@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class CatalogueIcon extends StatelessWidget {
+class CatalogueIcon extends StatefulWidget {
   const CatalogueIcon({
     required this.name,
     this.icon,
@@ -8,6 +9,12 @@ class CatalogueIcon extends StatelessWidget {
   });
   final String name;
   final IconData? icon;
+
+  @override
+  State<CatalogueIcon> createState() => _CatalogueIconState();
+}
+
+class _CatalogueIconState extends State<CatalogueIcon> {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.all(8),
@@ -17,21 +24,20 @@ class CatalogueIcon extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: Colors.brown[800],
+                color: Theme.of(context).textTheme.bodyLarge!.color,
                 shape: BoxShape.circle,
               ),
               child:  Icon(
-                icon ?? Icons.camera,
-                color: Colors.white,
-                size: 32,
+                widget.icon ?? Icons.camera,
+                color: Theme.of(context).iconTheme.color,
+                size: 40,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              name,
+              widget.name,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Colors.black87,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -53,13 +59,13 @@ class AddCatalogueIcon extends StatelessWidget {
             Container(
               width: 64,
               height: 64,
-              decoration: const BoxDecoration(
-                color: Colors.red,
+              decoration:  BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child:  Icon(
                 Icons.add,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.background,
                 size: 32,
               ),
             ),

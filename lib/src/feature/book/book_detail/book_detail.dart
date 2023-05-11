@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:freader/src/core/data/database/daos/book_dao.dart';
 import 'package:freader/src/core/utils/downloader.dart';
@@ -37,9 +38,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           status = event;
         });
       });
-    } else {
-
-    }
+    } else {}
 
     super.initState();
   }
@@ -51,15 +50,23 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.9,
-        width: MediaQuery.of(context).size.width,
-        child: Padding(
+  Widget build(BuildContext context) => PlatformScaffold(
+        appBar: PlatformAppBar(
+          title: const Text('Книжная карточка'),
+          leading: InkWell(
+            child: const Icon(Icons.close, size: 20,),
+            onTap: () => context.router.pop(),
+          ),
+        ),
+        body: Padding(
           padding: const EdgeInsets.all(8),
           child: SingleChildScrollView(
             child: Column(
               children: [
-                if (book != null) BookColumn(bookWithMetadata: book!) else OpdsColumn(opdsEntry: opdsEntry, status: status, downloader: downloader),
+                if (book != null)
+                  BookColumn(bookWithMetadata: book!)
+                else
+                  OpdsColumn(opdsEntry: opdsEntry, status: status, downloader: downloader),
               ],
             ),
           ),
@@ -75,16 +82,21 @@ class BookColumn extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Image.memory(
-          bookWithMetadata.book.cover!,
+            bookWithMetadata.book.cover!,
             fit: BoxFit.contain,
-            errorBuilder: (ctx, _, __) => SizedBox.shrink(),
+            errorBuilder: (ctx, _, __) => const SizedBox.shrink(),
           ),
-          ElevatedButton(onPressed: () =>context.router.push(
-            
-            BookReadingRoute(bookWithMetadata: bookWithMetadata,)), child: Text('Читать')),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.router.push(BookReadingRoute(
+                    bookWithMetadata: bookWithMetadata,
+                  ));
+              },
+              child: const Text('Читать')),
           Text(bookWithMetadata.metadata.title,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           HtmlWidget(bookWithMetadata.metadata.annotation),
@@ -98,7 +110,6 @@ class OpdsColumn extends StatelessWidget {
     required this.status,
     required this.downloader,
     super.key,
-
   });
 
   final OpdsEntry? opdsEntry;

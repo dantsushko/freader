@@ -1,29 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 @RoutePage()
 class ReadingScreen extends StatelessWidget {
   const ReadingScreen({super.key});
 
   @override
   Widget build(BuildContext context) => SafeArea(
-    child: Scaffold(
-          body: CustomScrollView(
-            slivers: <Widget>[
-              SliverAppBar(
-                snap: true,
-                floating: true,
-                expandedHeight: 40,
-                
-                title: const Text('Читаю'),
-                centerTitle: true,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.list_alt_rounded),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-              SliverGrid.count(
+    child: PlatformScaffold(
+      appBar: PlatformAppBar(title: const Text('Читаю')),
+          body: GridView.count(
                 crossAxisCount: 2,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
@@ -62,8 +48,8 @@ class ReadingScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            ],
-          ),
+            
+        
         ),
   );
 }

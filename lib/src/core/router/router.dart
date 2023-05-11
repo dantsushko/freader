@@ -37,7 +37,9 @@ class AppRouter extends $AppRouter {
               path: 'settings',
               children: [
                 AutoRoute(page: SettingsRoute.page, path: ''),
-                AutoRoute(page: IapRoute.page, path: 'iap')
+                AutoRoute(page: IapRoute.page, path: 'iap'),
+                AutoRoute(page: ThemeRoute.page
+                , path: 'themes')
               ],
             ),
           ],

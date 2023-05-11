@@ -31,6 +31,7 @@ mixin InitializationSteps {
     },
     'Init Database': (progress) async {
       final database = AppDatabase();
+      await database.settingsDao.init();
       return progress.copyWith(
         database: database,
       );

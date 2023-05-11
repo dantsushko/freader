@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:freader/src/core/router/router.gr.dart';
 import 'package:freader/src/core/utils/path.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
@@ -31,8 +32,8 @@ class _DirectoryContentScreenState extends State<DirectoryContentScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(),
+  Widget build(BuildContext context) => PlatformScaffold(
+        appBar: PlatformAppBar(),
         body: StreamBuilder<List<BookWithMetadata>>(
           stream: DependenciesScope.of(context)
               .dependencies

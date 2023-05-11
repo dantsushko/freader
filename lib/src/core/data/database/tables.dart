@@ -1,5 +1,9 @@
 import 'package:drift/drift.dart';
 
+enum ThemeName { day, sepia, night, dusk, dawn, pastel, sand, tango }
+
+enum PageScrollStyle { scroll, flip, shift, noAnimation }
+
 mixin AutoIncrementingPrimaryKey on Table {
   IntColumn get id => integer().autoIncrement()();
 }
@@ -48,4 +52,25 @@ class FileEntries extends Table {
   IntColumn get size => integer()();
   IntColumn get date => integer()();
   RealColumn get timestamp => real()();
+}
+
+@DataClassName('ThemeEntry')
+class ThemeEntries extends Table with AutoIncrementingPrimaryKey{
+  TextColumn get name => text().unique()();
+
+  IntColumn get accentColor => integer()();
+  IntColumn get textColor => integer()();
+  IntColumn get backgroundColor => integer()();
+  IntColumn get separatorColor => integer()();
+  IntColumn get greyColor => integer()();
+  IntColumn get controlColor => integer()();
+  IntColumn get highlightColor => integer()();
+  IntColumn get secondaryTextColor => integer()();
+
+}
+
+@DataClassName('SettingsEntry')
+class SettingsEntries extends Table  with AutoIncrementingPrimaryKey{
+  IntColumn get tid => integer().references(ThemeEntries, #id, onDelete: KeyAction.cascade)();
+  IntColumn get pageScrollStyle => intEnum<PageScrollStyle>()();
 }
