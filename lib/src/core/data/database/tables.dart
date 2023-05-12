@@ -84,4 +84,5 @@ class SettingsEntries extends Table with AutoIncrementingPrimaryKey {
   IntColumn get pageHorizontalPadding => integer()();
   IntColumn get pageTopPadding => integer()();
   IntColumn get pageBottomPadding => integer()();
+  IntColumn get letterSpacing => integer()();
 }

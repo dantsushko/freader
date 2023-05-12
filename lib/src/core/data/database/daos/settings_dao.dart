@@ -14,7 +14,7 @@ class SettingsModel {
     pageHorizontalPadding = settingsEntry.pageHorizontalPadding;
     pageTopPadding = settingsEntry.pageTopPadding;
     pageBottomPadding = settingsEntry.pageBottomPadding;
-
+    letterSpacing = settingsEntry.letterSpacing;
   }
   late final ThemeData materialTheme;
   late final PageScrollStyle pageScrollStyle;
@@ -22,11 +22,8 @@ class SettingsModel {
   late final int pageHorizontalPadding;
   late final int pageTopPadding;
   late final int pageBottomPadding;
+  late final int letterSpacing;
 }
-
-
-
-
 
 @DriftAccessor(tables: [SettingsEntries])
 class SettingsDao extends DatabaseAccessor<AppDatabase> with _$SettingsDaoMixin {
@@ -69,52 +66,72 @@ class SettingsDao extends DatabaseAccessor<AppDatabase> with _$SettingsDaoMixin 
     return query.watch();
   }
 
-
-
-  Future<void> setTheme(int themeId) async {
-    await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
-      SettingsEntriesCompanion(
-        tid: Value(themeId),
-      ),
+  Future<void> updateSetting({
+    int? themeId,
+    PageScrollStyle? pageScrollStyle,
+    int? fontSize,
+    int? pageHorizontalPadding,
+    int? pageTopPadding,
+    int? pageBottomPadding,
+    int? letterSpacing,
+  }) async {
+    final comp = const SettingsEntriesCompanion().copyWith(
+      tid: themeId != null ? Value(themeId) : null,
+      pageScrollStyle: pageScrollStyle != null ? Value(pageScrollStyle) : null,
+      fontSize: fontSize != null ? Value(fontSize) : null,
+      pageHorizontalPadding: pageHorizontalPadding != null ? Value(pageHorizontalPadding) : null,
+      pageTopPadding: pageTopPadding != null ? Value(pageTopPadding) : null,
+      pageBottomPadding: pageBottomPadding != null ? Value(pageBottomPadding) : null,
+      letterSpacing: letterSpacing != null ? Value(letterSpacing) : null,
     );
-    
+    await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(comp);
   }
 
-  Future<void> setPageScrollStyle(PageScrollStyle style) async {
-    await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
-      SettingsEntriesCompanion(
-        pageScrollStyle: Value(style),
-      ),
-    );
-  }
+  // Future<void> setTheme(int themeId) async {
+  //   await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
+  //     SettingsEntriesCompanion(
+  //       tid: Value(themeId),
+  //     ),
+  //   );
+  // }
 
-  Future<void> setFontSize(int size) async {
-    await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
-      SettingsEntriesCompanion(
-        fontSize: Value(size),
-      ),
-    );
-  }
-  Future<void> setPageHorizontalPadding(int pageHorizontalPadding) async {
-    await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
-      SettingsEntriesCompanion(
-        pageHorizontalPadding: Value(pageHorizontalPadding),
-      ),
-    );
-  }
-    Future<void> setPageTopPadding(int pageTopPadding) async {
-    await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
-      SettingsEntriesCompanion(
-        pageTopPadding: Value(pageTopPadding),
-      ),
-    );
-  }
+  // Future<void> setPageScrollStyle(PageScrollStyle style) async {
+  //   await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
+  //     SettingsEntriesCompanion(
+  //       pageScrollStyle: Value(style),
+  //     ),
+  //   );
+  // }
 
-  Future<void> setPageBottomPadding(int pageBottomPadding) async {
-    await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
-      SettingsEntriesCompanion(
-        pageBottomPadding: Value(pageBottomPadding),
-      ),
-    );
-  }
+  // Future<void> setFontSize(int size) async {
+  //   await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
+  //     SettingsEntriesCompanion(
+  //       fontSize: Value(size),
+  //     ),
+  //   );
+  // }
+
+  // Future<void> setPageHorizontalPadding(int pageHorizontalPadding) async {
+  //   await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
+  //     SettingsEntriesCompanion(
+  //       pageHorizontalPadding: Value(pageHorizontalPadding),
+  //     ),
+  //   );
+  // }
+
+  // Future<void> setPageTopPadding(int pageTopPadding) async {
+  //   await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
+  //     SettingsEntriesCompanion(
+  //       pageTopPadding: Value(pageTopPadding),
+  //     ),
+  //   );
+  // }
+
+  // Future<void> setPageBottomPadding(int pageBottomPadding) async {
+  //   await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(
+  //     SettingsEntriesCompanion(
+  //       pageBottomPadding: Value(pageBottomPadding),
+  //     ),
+  //   );
+  // }
 }

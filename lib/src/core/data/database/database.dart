@@ -84,7 +84,7 @@ class AppDatabase extends _$AppDatabase {
                   pageBottomPadding: 0,
                   pageTopPadding: 0,
                   pageHorizontalPadding: 2,
-                
+                  letterSpacing: -2
                 ),);
             });
           }

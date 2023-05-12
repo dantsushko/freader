@@ -81,7 +81,7 @@ class _BookSettingsScrenState extends State<BookSettingsScren> {
                                             .dependencies
                                             .database
                                             .settingsDao
-                                            .setTheme(e.id),
+                                            .updateSetting(themeId: e.id),
                                         child: ThemeCircle(
                                           theme: e,
                                         ),
@@ -97,34 +97,16 @@ class _BookSettingsScrenState extends State<BookSettingsScren> {
                   ],
                 ),
                 SettingsSection(
-                  title: const Text('ПОЛЯ СТРАНИЦЫ'),
+                  title: Text('ШРИФТ'),
                   tiles: [
                     SettingsTile(
-                        title: const Text('Слева/Справа'),
+                        title: const Text('Расстояние между буквами'),
                         value: PlusMinusButton<int>(
-                          value: settings.pageHorizontalPadding,
+                          value: settings.letterSpacing,
                           unit: 'px',
-                          minValue: 5,
-                          maxValue: 75,
-                          onChanged: (value) => _settingsDao.setPageHorizontalPadding(value),
-                        )),
-                    SettingsTile(
-                        title: const Text('Верх'),
-                        value: PlusMinusButton<int>(
-                          value: settings.pageTopPadding,
-                          unit: 'px',
-                          minValue: 0,
-                          maxValue: 75,
-                          onChanged: (value) => _settingsDao.setPageTopPadding(value),
-                        )),
-                    SettingsTile(
-                        title: const Text('Низ'),
-                        value: PlusMinusButton<int>(
-                          value: settings.pageBottomPadding,
-                          unit: 'px',
-                          minValue: 0,
-                          maxValue: 75,
-                          onChanged: (value) => _settingsDao.setPageBottomPadding(value),
+                          minValue: -2,
+                          maxValue: 3,
+                          onChanged: (value) => _settingsDao.updateSetting(letterSpacing: value),
                         ))
                   ],
                 ),
@@ -137,16 +119,49 @@ class _BookSettingsScrenState extends State<BookSettingsScren> {
                           unit: 'pt',
                           minValue: 8,
                           maxValue: 32,
-                          onChanged: (value) => _settingsDao.setFontSize(value),
+                          onChanged: (value) => _settingsDao.updateSetting(fontSize: value),
                         ))
                   ],
                 ),
+                SettingsSection(
+                  title: const Text('ПОЛЯ СТРАНИЦЫ'),
+                  tiles: [
+                    SettingsTile(
+                        title: const Text('Слева/Справа'),
+                        value: PlusMinusButton<int>(
+                          value: settings.pageHorizontalPadding,
+                          unit: 'px',
+                          minValue: 5,
+                          maxValue: 75,
+                          onChanged: (value) => _settingsDao.updateSetting(pageHorizontalPadding: value),
+                        )),
+                    SettingsTile(
+                        title: const Text('Верх'),
+                        value: PlusMinusButton<int>(
+                          value: settings.pageTopPadding,
+                          unit: 'px',
+                          minValue: 0,
+                          maxValue: 75,
+                          onChanged: (value) => _settingsDao.updateSetting(pageTopPadding: value),
+                        )),
+                    SettingsTile(
+                        title: const Text('Низ'),
+                        value: PlusMinusButton<int>(
+                          value: settings.pageBottomPadding,
+                          unit: 'px',
+                          minValue: 0,
+                          maxValue: 75,
+                          onChanged: (value) => _settingsDao.updateSetting(pageBottomPadding: value),
+                        ))
+                  ],
+                ),
+               
                 SettingsSection(
                   title: const Text('РЕЖИМ СМЕНЫ СТРАНИЦ'),
                   tiles: PageScrollStyle.values
                       .map(
                         (e) => SettingsTile(
-                          onPressed: (ctx) => _settingsDao.setPageScrollStyle(e),
+                          onPressed: (ctx) => _settingsDao.updateSetting(pageScrollStyle: e),
                           trailing: settings.pageScrollStyle == e
                               ? Icon(
                                   Icons.check,

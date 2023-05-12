@@ -32,7 +32,7 @@ class _ThemeScreenState extends State<ThemeScreen> {
             itemBuilder: (ctx, index) => ListTile(
               title: Text(themes[index].name),
               onTap: () {
-                DependenciesScope.dependenciesOf(context).database.settingsDao.setTheme(themes[index].id);
+                DependenciesScope.dependenciesOf(context).database.settingsDao.updateSetting(themeId: themes[index].id);
               },
 
             ),
