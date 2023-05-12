@@ -21,7 +21,7 @@ class AppRouter extends $AppRouter {
               AutoRoute(page: DirectoryContentRoute.page, path: 'directory'),
               CustomRoute(
                 transitionsBuilder: TransitionsBuilders.fadeIn,
-                page: BookReadingRoute.page, path: 'book_reading'),
+                page: BookReadingRoute.page, path: 'book_reading',),
             ],),
             AutoRoute(
               
@@ -39,7 +39,7 @@ class AppRouter extends $AppRouter {
                 AutoRoute(page: SettingsRoute.page, path: ''),
                 AutoRoute(page: IapRoute.page, path: 'iap'),
                 AutoRoute(page: ThemeRoute.page
-                , path: 'themes')
+                , path: 'themes',)
               ],
             ),
           ],

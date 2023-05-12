@@ -23,7 +23,5 @@ class FB2Image {
   late final String name;
 
   @override
-  String toString() {
-    return 'FB2Image(name: $name)';
-  }
+  String toString() => 'FB2Image(name: $name)';
 }

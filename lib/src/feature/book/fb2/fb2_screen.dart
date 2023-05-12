@@ -1,11 +1,11 @@
-import 'package:flutter/gestures.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:freader/src/core/data/database/daos/settings_dao.dart';
 import 'package:freader/src/core/parser/fb2_parser/fb2_parser.dart';
+import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:xml/xml.dart';
 
-import '../../../core/parser/fb2_parser/model/section.dart';
 
 class FB2Screen extends StatefulWidget {
   const FB2Screen({
@@ -25,13 +25,13 @@ class _FB2ScreenState extends State<FB2Screen> {
 
     for (final node in element.children) {
       if (node is XmlText) {
-        textSpans.add(TextSpan(text: node.toString()));
+        textSpans.add(TextSpan(text: node.toString(), style: TextStyle(fontSize: fontSize)));
       } else if (node is XmlElement) {
         if (node.name.local == 'emphasis') {
           textSpans.add(
             TextSpan(
               text: node.innerText,
-              style: const TextStyle(fontStyle: FontStyle.italic),
+              style: TextStyle(fontStyle: FontStyle.italic, fontSize: fontSize),
             ),
           );
         } else if (node.name.local == 'a') {
@@ -41,16 +41,18 @@ class _FB2ScreenState extends State<FB2Screen> {
           textSpans.add(
             WidgetSpan(
               child: Tooltip(
-                  triggerMode: TooltipTriggerMode.tap,
-                  verticalOffset: 10,
-                  preferBelow: false,
-                  waitDuration: Duration.zero,
-                  showDuration: const Duration(seconds: 10),
-                  richMessage: TextSpan(children: [TextSpan(text: link?.text ?? 'Link')]),
-                  child: Text(
-                    node.innerText,
-                    style: TextStyle(decoration: TextDecoration.underline, color: Theme.of(context).primaryColor),
-                  ),),
+                triggerMode: TooltipTriggerMode.tap,
+                verticalOffset: 10,
+                preferBelow: false,
+                waitDuration: Duration.zero,
+                showDuration: const Duration(seconds: 10),
+                richMessage: TextSpan(children: [TextSpan(text: link?.text ?? 'Link')]),
+                child: Text(
+                  node.innerText,
+                  style: TextStyle(
+                      decoration: TextDecoration.underline, color: Theme.of(context).primaryColor, fontSize: fontSize,),
+                ),
+              ),
             ),
           );
         }
@@ -58,7 +60,9 @@ class _FB2ScreenState extends State<FB2Screen> {
     }
 
     return SelectableText.rich(
-      TextSpan(children: textSpans),
+      TextSpan(
+        children: textSpans,
+      ),
     );
   }
 
@@ -81,7 +85,7 @@ class _FB2ScreenState extends State<FB2Screen> {
               .map(
                 (paragraph) => Text(
                   paragraph,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize),
                 ),
               )
               .toList(),
@@ -94,7 +98,7 @@ class _FB2ScreenState extends State<FB2Screen> {
       final image = book.images.firstWhere((element) => element.name == imageUrl);
       return Padding(
         padding: const EdgeInsets.all(8),
-        child: Image.memory(image.bytes),
+        child: Image.memory(key: ValueKey(image.name), image.bytes),
       );
     } else if (element.name.local == 'subtitle') {
       return Padding(
@@ -102,37 +106,54 @@ class _FB2ScreenState extends State<FB2Screen> {
         child: Center(
           child: Text(
             element.innerText,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: subtitleFontSize),
           ),
         ),
       );
     } else if (element.name.local == 'p') {
       return Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8),
         child: _buildParagraphWidget(element),
       );
     }
     return const SizedBox.shrink();
   }
 
+  late SettingsModel settings;
+  double get fontSize => settings.fontSize.toDouble();
+  double get subtitleFontSize => fontSize + 2;
+  double get titleFontSize => fontSize + 4;
+  int get pageHorizontalPadding => settings.pageHorizontalPadding;
+  int get pageTopPadding => settings.pageTopPadding;
+  int get pageBottomPadding => settings.pageBottomPadding;
+
+  late final StreamSubscription subscription;
   @override
   void initState() {
+    settings = DependenciesScope.dependenciesOf(context).database.settingsDao.initialSettings;
+    subscription = DependenciesScope.dependenciesOf(context)
+        .database
+        .settingsDao
+        .watch()
+        .listen((event) => setState(() => settings = event));
     book = widget.book;
     super.initState();
   }
 
   @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) => ListView(
-        children: [
-          Center(
-            child: Text(
-              book.bookTitle,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Image.memory(book.cover.bytes),
-          Text(book.body.epigraph ?? ''),
-          ...book.body.sections.map((e) => _buildWidget(e.content!))
-        ],
-      );
+            children: [
+              Image.memory(book.cover.bytes),
+              Text(book.body.epigraph ?? '', style: TextStyle(fontSize: fontSize)),
+              ...book.body.sections.map((e) => _buildWidget(e.content))
+            ],
+          );
+        
+      
 }

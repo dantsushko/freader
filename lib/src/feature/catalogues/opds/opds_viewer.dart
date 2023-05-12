@@ -49,13 +49,19 @@ class _OpdsViewerState extends State<OpdsViewer> {
 
   final PagingController<int, OpdsEntry> _pagingController = PagingController(firstPageKey: 0);
   @override
-  Widget build(BuildContext context) => PagedListView<int, OpdsEntry>(
-        pagingController: _pagingController,
-        builderDelegate: PagedChildBuilderDelegate<OpdsEntry>(
-          itemBuilder: (context, item, index) => OpdsCard(
-            entry: item,
+  Widget build(BuildContext context) => RefreshIndicator(
+    displacement: 20,
+    onRefresh: () => Future.sync( _pagingController.refresh),
+    child: PagedListView<int, OpdsEntry>.separated(
+          pagingController: _pagingController,
+          shrinkWrap: true,
+          separatorBuilder: (context, index) => Divider(color: Theme.of(context).dividerColor,),
+          builderDelegate: PagedChildBuilderDelegate<OpdsEntry>(
+            itemBuilder: (context, item, index) => OpdsCard(
+              entry: item,
+            ),
           ),
         ),
-      );
+  );
 }
 

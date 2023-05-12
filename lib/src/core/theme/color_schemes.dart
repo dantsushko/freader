@@ -1,4 +1,5 @@
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../data/database/database.dart';
@@ -28,6 +29,10 @@ ThemeData themeFromDB(ThemeEntry theme) => ThemeData(
               borderRadius: BorderRadius.circular(8),
             ),
           ),
+     pageTransitionsTheme: const PageTransitionsTheme(builders: {
+        TargetPlatform.iOS: NoShadowCupertinoPageTransitionsBuilder(),
+        TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+      },),
     textSelectionTheme: TextSelectionThemeData(selectionColor: Color(theme.highlightColor)),
       colorScheme: convertToColorScheme(theme),
       dividerColor: Color(theme.separatorColor), //divider
@@ -53,11 +58,11 @@ ThemeData themeFromDB(ThemeEntry theme) => ThemeData(
           backgroundColor: Color(theme.backgroundColor),
           centerTitle: true,
           elevation: 1,
-          titleTextStyle: TextStyle(color: Color(theme.textColor), fontWeight: FontWeight.bold)),
+          titleTextStyle: TextStyle(color: Color(theme.textColor), fontWeight: FontWeight.bold),),
       bottomNavigationBarTheme: ThemeData.light().bottomNavigationBarTheme.copyWith(
           unselectedItemColor: Color(theme.secondaryTextColor),
            elevation: 1,
-          backgroundColor: Color(theme.backgroundColor)),
+          backgroundColor: Color(theme.backgroundColor),),
     );
 ColorScheme convertToColorScheme(ThemeEntry theme) => ColorScheme(
       brightness: Brightness.light,

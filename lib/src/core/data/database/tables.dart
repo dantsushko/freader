@@ -2,7 +2,15 @@ import 'package:drift/drift.dart';
 
 enum ThemeName { day, sepia, night, dusk, dawn, pastel, sand, tango }
 
-enum PageScrollStyle { scroll, flip, shift, noAnimation }
+enum PageScrollStyle {
+  scroll('Прокрутка'),
+  flip('Перелистывание'),
+  shift('Сдвиг'),
+  noAnimation('Без анимации');
+  const PageScrollStyle(this.label);
+  final String label;
+
+}
 
 mixin AutoIncrementingPrimaryKey on Table {
   IntColumn get id => integer().autoIncrement()();
@@ -55,7 +63,7 @@ class FileEntries extends Table {
 }
 
 @DataClassName('ThemeEntry')
-class ThemeEntries extends Table with AutoIncrementingPrimaryKey{
+class ThemeEntries extends Table with AutoIncrementingPrimaryKey {
   TextColumn get name => text().unique()();
 
   IntColumn get accentColor => integer()();
@@ -66,11 +74,14 @@ class ThemeEntries extends Table with AutoIncrementingPrimaryKey{
   IntColumn get controlColor => integer()();
   IntColumn get highlightColor => integer()();
   IntColumn get secondaryTextColor => integer()();
-
 }
 
 @DataClassName('SettingsEntry')
-class SettingsEntries extends Table  with AutoIncrementingPrimaryKey{
+class SettingsEntries extends Table with AutoIncrementingPrimaryKey {
   IntColumn get tid => integer().references(ThemeEntries, #id, onDelete: KeyAction.cascade)();
   IntColumn get pageScrollStyle => intEnum<PageScrollStyle>()();
+  IntColumn get fontSize => integer()();
+  IntColumn get pageHorizontalPadding => integer()();
+  IntColumn get pageTopPadding => integer()();
+  IntColumn get pageBottomPadding => integer()();
 }

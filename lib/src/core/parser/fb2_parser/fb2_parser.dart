@@ -16,11 +16,13 @@ class FB2Book {
     required this.body,
     required this.images,
     required this.links,
+    required this.wordCount,
   });
   final FB2Description description;
   final FB2Body body;
   final List<FB2Image> images;
   final Map<String, FB2Link> links;
+  final int wordCount;
   List<FB2Author> get authors => description.titleInfo.authors;
   String get bookTitle => description.titleInfo.bookTitle;
   String? get language => description.titleInfo.language;
@@ -44,5 +46,6 @@ Future<FB2Book> parseFB2(Uint8List bytes) async {
         .map(FB2Link.new))
       '#${e.name}': e
   };
-  return FB2Book(body: body, description: description, images: images, links: links);
+  final wordCount = body.sections.map((e) => e.wordCount).reduce((value, element) => value + element);
+  return FB2Book(body: body, description: description, images: images, links: links, wordCount: wordCount);
 }

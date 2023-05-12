@@ -15,6 +15,14 @@ List<String> dirsToWatch = [
 ];
 
 class FileWatcher {
+
+  FileWatcher(this.db) {
+    for (final dir in dirsToWatch) {
+      subscriptions.add(Watcher(dir, pollingDelay: const Duration(seconds: 3))
+          .events
+          .listen((event) => onEvent(event, dir)),);
+    }
+  }
   Future<void> onEvent(WatchEvent event, String dir) async {
     l.i(event);
     if (event.type == ChangeType.ADD) {
@@ -33,14 +41,6 @@ class FileWatcher {
         print('delete book');
         await db.bookDao.deleteBook(getFileName(event.path));
       }
-    }
-  }
-
-  FileWatcher(this.db) {
-    for (final dir in dirsToWatch) {
-      subscriptions.add(Watcher(dir, pollingDelay: const Duration(seconds: 3))
-          .events
-          .listen((event) => onEvent(event, dir)));
     }
   }
   final AppDatabase db;

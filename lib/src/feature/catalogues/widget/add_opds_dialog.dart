@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
 class CustomDialog extends StatefulWidget {
-  const CustomDialog({Key? key}) : super(key: key);
+  const CustomDialog({super.key});
 
   @override
   _CustomDialogState createState() => _CustomDialogState();

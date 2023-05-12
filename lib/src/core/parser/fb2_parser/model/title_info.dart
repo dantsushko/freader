@@ -1,6 +1,5 @@
 import 'package:xml/xml.dart';
 
-import 'annotation.dart';
 import 'author.dart';
 
 class FB2TitleInfo {

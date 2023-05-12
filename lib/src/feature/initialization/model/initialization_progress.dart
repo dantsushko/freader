@@ -1,9 +1,9 @@
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/file/watcher.dart';
+import 'package:freader/src/core/router/router.dart';
 import 'package:freader/src/core/utils/downloader.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:freader/src/core/router/router.dart';
 
 part 'initialization_progress.freezed.dart';
 

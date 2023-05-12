@@ -20,7 +20,7 @@ part 'database.g.dart';
   BookDao,
   MetadataDao,
   SettingsDao,
-])
+],)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(impl.connect());
 
@@ -31,16 +31,6 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        // onUpgrade: (m, from, to) async {
-        //   for (var step = from + 1; step <= to; step++) {
-        //     switch (step) {
-        //       case 2:
-        //         // add table
-        //         await m.createTable(downloadEntries);
-        //         break;
-        //     }
-        //   }
-        // },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
           if (details.wasCreated) {
@@ -87,10 +77,15 @@ class AppDatabase extends _$AppDatabase {
                     ),
                   ],
                 )
-                ..insert(settingsEntries, const SettingsEntriesCompanion(
-                  tid: Value(1),
-                  pageScrollStyle: Value(PageScrollStyle.scroll),
-                ));
+                ..insert(settingsEntries, SettingsEntriesCompanion.insert(
+                  tid: 1,
+                  pageScrollStyle: PageScrollStyle.scroll,
+                  fontSize: 20,
+                  pageBottomPadding: 0,
+                  pageTopPadding: 0,
+                  pageHorizontalPadding: 2,
+                
+                ),);
             });
           }
           await impl.validateDatabaseSchema(this);

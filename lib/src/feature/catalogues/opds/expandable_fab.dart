@@ -178,9 +178,8 @@ class _ExpandingActionButton extends StatelessWidget {
 @immutable
 class ActionButton extends StatelessWidget {
   const ActionButton({
-    super.key,
+    required this.icon, super.key,
     this.onPressed,
-    required this.icon,
   });
 
   final VoidCallback? onPressed;

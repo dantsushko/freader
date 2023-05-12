@@ -11,7 +11,6 @@ import 'package:freader/src/core/utils/path.dart';
 import 'package:http/http.dart' as http;
 import 'package:l/l.dart';
 import 'package:path/path.dart' as path;
-import 'package:permission_handler/permission_handler.dart';
 
 import '../constants/constants.dart';
 
@@ -70,7 +69,7 @@ class Downloader {
         state = DownloadState.downloading;
       }
       downloadController.add(DownloadStatus(progress, state));
-    });
+    },);
 
     // }
   }

@@ -1,6 +1,5 @@
-import 'package:xml/xml.dart';
 
 class FB2Annotation {
-  FB2Annotation(XmlElement annotation);
+  FB2Annotation();
   final List<String> paragraphs = [];
 }

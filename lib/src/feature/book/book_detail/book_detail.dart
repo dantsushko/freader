@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +6,10 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:freader/src/core/data/database/daos/book_dao.dart';
 import 'package:freader/src/core/utils/downloader.dart';
+import 'package:freader/src/feature/book/book_reading_screen.dart';
 import 'package:freader/src/feature/catalogues/opds/model/opds_entry.model.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
-import '../../../core/router/router.gr.dart';
 
 class BookDetailScreen extends StatefulWidget {
   const BookDetailScreen({super.key, this.opdsEntry, this.book})
@@ -57,17 +56,20 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             child: const Icon(Icons.close, size: 20,),
             onTap: () => context.router.pop(),
           ),
+         
         ),
         body: Padding(
           padding: const EdgeInsets.all(8),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                if (book != null)
-                  BookColumn(bookWithMetadata: book!)
-                else
-                  OpdsColumn(opdsEntry: opdsEntry, status: status, downloader: downloader),
-              ],
+          child: SizedBox(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  if (book != null)
+                    BookColumn(bookWithMetadata: book!)
+                  else
+                    OpdsColumn(opdsEntry: opdsEntry, status: status, downloader: downloader),
+                ],
+              ),
             ),
           ),
         ),
@@ -88,14 +90,11 @@ class BookColumn extends StatelessWidget {
           ),
           ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                context.router.push(BookReadingRoute(
-                    bookWithMetadata: bookWithMetadata,
-                  ));
+                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (ctx) => BookReadingScreen(bookWithMetadata: bookWithMetadata)));
               },
-              child: const Text('Читать')),
+              child: const Text('Читать'),),
           Text(bookWithMetadata.metadata.title,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
           const SizedBox(
             height: 10,
           ),

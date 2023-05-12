@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:freader/src/feature/catalogues/opds/opds_viewer.dart';
-import 'package:http/http.dart' as http;
 
 @RoutePage()
 class OpdsScreen extends StatefulWidget {

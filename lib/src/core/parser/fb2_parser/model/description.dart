@@ -1,5 +1,5 @@
 import 'package:freader/src/core/parser/fb2_parser/model/document_info.dart';
-import 'package:freader/src/core/parser/fb2_parser/model/publish_info.dart';
+
 import 'package:freader/src/core/parser/fb2_parser/model/title_info.dart';
 import 'package:xml/xml.dart';
 
@@ -10,7 +10,6 @@ class FB2Description {
   } 
   late final FB2TitleInfo titleInfo;
   late final FB2DocumentInfo? documentInfo;
-  late final FB2PublishInfo? publishInfo;
 
 
 

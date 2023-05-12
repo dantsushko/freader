@@ -23,10 +23,11 @@ void main() {
       expect(titleInfo.language, 'ru');
       expect(titleInfo.authors.length, 1);
       expect(titleInfo.authors.first.firstName, 'Стивен');
-      expect(titleInfo.authors.first.lastName, 'Кинг'); 
-      expect(titleInfo.genres, ['sf_fantasy']);    
+      expect(titleInfo.authors.first.lastName, 'Кинг');
+      expect(titleInfo.genres, ['sf_fantasy']);
+      print(skazka.wordCount);
+      
     });
-    
   });
   group('fool.fb2', () {
     test('Check titleInfo parsing', () {
@@ -36,7 +37,7 @@ void main() {
       expect(titleInfo.authors.length, 1);
       expect(titleInfo.authors.first.firstName, 'Робин');
       expect(titleInfo.authors.first.lastName, 'Хобб');
-      expect(titleInfo.genres, ['foreign_fantasy', 'magician_book']);    
+      expect(titleInfo.genres, ['foreign_fantasy', 'magician_book']);
     });
   });
 }

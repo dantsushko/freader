@@ -10,8 +10,8 @@ import 'model/opds_link.model.dart';
 class OpdsCard extends StatelessWidget {
   const OpdsCard({
     required this.entry,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final OpdsEntry entry;
 

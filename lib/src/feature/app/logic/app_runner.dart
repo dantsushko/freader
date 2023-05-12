@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freader/src/core/utils/logger.dart';
@@ -7,7 +8,7 @@ import 'package:freader/src/feature/app/widget/app.dart';
 import 'package:freader/src/feature/initialization/logic/initialization_processor.dart';
 import 'package:freader/src/feature/initialization/logic/initialization_steps.dart';
 import 'package:freader/src/feature/initialization/model/initialization_hook.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
+
 import '../../../core/bloc/observer.dart';
 
 /// A class which is responsible for initialization and running the app.

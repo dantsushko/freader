@@ -14,7 +14,7 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Настройки'),
             automaticallyImplyLeading: true,
             cupertino: (context, platform) => CupertinoNavigationBarData(
-                backgroundColor: CupertinoTheme.of(context).barBackgroundColor)),
+                backgroundColor: CupertinoTheme.of(context).barBackgroundColor,),),
         body: Center(
           child: SettingsList(
             platform: DevicePlatform.iOS,

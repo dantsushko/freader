@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:freader/src/core/router/router.gr.dart';
@@ -97,5 +96,5 @@ class _CataloguesScreenState extends State<CataloguesScreen> with ContextMenuMix
             itemBuilder: (context, index) => gridChildren[index],
           );
         },
-      ));
+      ),);
 }

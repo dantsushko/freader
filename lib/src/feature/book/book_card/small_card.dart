@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:freader/src/core/data/database/daos/book_dao.dart';
@@ -27,7 +26,7 @@ class SmallCard extends StatelessWidget {
                     child: BookDetailScreen(
                       book: entity,
                     ),
-                  )),
+                  ),),
           child: Card(
             child: Row(
               children: [
@@ -86,7 +85,7 @@ class SmallCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Icon(Icons.more_vert)
+                const Icon(Icons.more_vert)
               ],
             ),
           ),

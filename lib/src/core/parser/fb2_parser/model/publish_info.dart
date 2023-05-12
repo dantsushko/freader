@@ -1,3 +1,0 @@
-class FB2PublishInfo{
-  
-}

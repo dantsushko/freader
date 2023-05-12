@@ -4,7 +4,6 @@ import 'package:drift/drift.dart';
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/data/database/tables.dart';
 import 'package:freader/src/core/parser/parser.dart';
-import 'package:freader/src/core/utils/path.dart';
 
 part 'book_dao.g.dart';
 
@@ -13,9 +12,7 @@ class BookWithMetadata {
   final BookEntry book;
   final MetadataEntry metadata;
   @override
-  String toString() {
-    return 'BookWithMetadata(book: ${book.filename}, dir: ${book.directory} metadata: ${metadata.language})';
-  }
+  String toString() => 'BookWithMetadata(book: ${book.filename}, dir: ${book.directory} metadata: ${metadata.language})';
 }
 
 @DriftAccessor(tables: [BookEntries, MetadataEntries])
@@ -49,7 +46,7 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
         specific: 'specific',
         coverurl: 'coverurl',
         downloadurl: 'downloadurl',
-        timestamp: 0);
+        timestamp: 0,);
     await into(metadataEntries).insert(metaData);
   }
 
@@ -66,6 +63,6 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
     }
     return query.watch().map((books) => books
         .map((e) => BookWithMetadata(e.readTable(bookEntries), e.readTable(metadataEntries)))
-        .toList());
+        .toList(),);
   }
 }

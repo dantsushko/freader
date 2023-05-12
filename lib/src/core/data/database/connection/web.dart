@@ -11,7 +11,7 @@ const _useWorker = true;
 DatabaseConnection connect({bool isInWebWorker = false}) {
   if (_useWorker && !isInWebWorker) {
     return DatabaseConnection.delayed(
-        connectToDriftWorker('shared_worker.dart.js', mode: DriftWorkerMode.shared));
+        connectToDriftWorker('shared_worker.dart.js', mode: DriftWorkerMode.shared),);
   } else {
     return DatabaseConnection.delayed(
       Future.sync(() async {

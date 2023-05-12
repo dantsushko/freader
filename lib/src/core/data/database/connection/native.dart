@@ -21,7 +21,7 @@ Future<File> get databaseFile async {
 DatabaseConnection connect() =>
     DatabaseConnection.delayed(Future(() async => NativeDatabase.createBackgroundConnection(
           await databaseFile,
-        )));
+        ),),);
 
 Future<void> validateDatabaseSchema(GeneratedDatabase database) async {
   if (kDebugMode) {
