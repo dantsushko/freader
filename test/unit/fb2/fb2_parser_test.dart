@@ -25,7 +25,7 @@ void main() {
       expect(titleInfo.authors.first.firstName, 'Стивен');
       expect(titleInfo.authors.first.lastName, 'Кинг');
       expect(titleInfo.genres, ['sf_fantasy']);
-      print(skazka.wordCount);
+      expect(skazka.wordCount, 192406);
       
     });
   });

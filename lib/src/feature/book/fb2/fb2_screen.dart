@@ -80,6 +80,7 @@ class _FB2ScreenState extends State<FB2Screen> {
     if (element.name.local == 'section') {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        
         children: element.childElements.map(_buildWidget).toList(),
       );
     } else if (element.name.local == 'title') {

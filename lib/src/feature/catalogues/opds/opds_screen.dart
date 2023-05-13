@@ -6,8 +6,8 @@ import 'package:freader/src/feature/catalogues/opds/opds_viewer.dart';
 @RoutePage()
 class OpdsScreen extends StatefulWidget {
   const OpdsScreen({
-    required this.url,
-    required this.name,
+    @queryParam this.url = '',
+    @queryParam  this.name = '',
     super.key,
   });
   final String url;

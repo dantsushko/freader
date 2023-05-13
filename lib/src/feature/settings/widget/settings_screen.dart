@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:freader/src/core/router/router.gr.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 @RoutePage()
@@ -11,21 +12,22 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PlatformScaffold(
         appBar: PlatformAppBar(
-            title: const Text('Настройки'),
-            automaticallyImplyLeading: true,
-            cupertino: (context, platform) => CupertinoNavigationBarData(
-                backgroundColor: CupertinoTheme.of(context).barBackgroundColor,),),
+          title: const Text('Настройки'),
+          automaticallyImplyLeading: true,
+          cupertino: (context, platform) => CupertinoNavigationBarData(
+            backgroundColor: CupertinoTheme.of(context).barBackgroundColor,
+          ),
+        ),
         body: Center(
           child: SettingsList(
             platform: DevicePlatform.iOS,
             shrinkWrap: true,
             lightTheme: SettingsThemeData(
               settingsListBackground: Theme.of(context).scaffoldBackgroundColor,
-              settingsSectionBackground:  Theme.of(context).cardColor,
+              settingsSectionBackground: Theme.of(context).cardColor,
               trailingTextColor: Theme.of(context).textTheme.bodyLarge!.color,
               dividerColor: Theme.of(context).dividerColor,
               settingsTileTextColor: Theme.of(context).textTheme.bodyLarge!.color,
-              
             ),
             sections: [
               SettingsSection(
@@ -56,7 +58,10 @@ class SettingsScreen extends StatelessWidget {
                       Icons.arrow_forward_ios,
                       size: 16,
                     ),
-                    onPressed: (ctx) => context.router.pushNamed('iap'),
+                    // onPressed: (ctx) => context.navigateTo(
+                        // CataloguesTab(children: [OpdsRoute(name: 'Flibusta', url: 'https://flibusta.is/opds')])),
+
+                    onPressed: (ctx) => context.router.pushAll([ BaseRoute(), CataloguesRoute(), OpdsRoute()]),
                     title: const Text('Загрузки'),
                   ),
                   SettingsTile.navigation(

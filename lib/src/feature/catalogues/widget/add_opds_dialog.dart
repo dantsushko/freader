@@ -5,7 +5,7 @@ class CustomDialog extends StatefulWidget {
   const CustomDialog({super.key});
 
   @override
-  _CustomDialogState createState() => _CustomDialogState();
+  State<CustomDialog> createState() => _CustomDialogState();
 }
 
 class _CustomDialogState extends State<CustomDialog> {

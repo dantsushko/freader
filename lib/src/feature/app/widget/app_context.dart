@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:freader/src/core/localization/app_localization.dart';
+import 'package:freader/src/core/router/go_router.dart';
+import 'package:freader/src/core/router/router.gr.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
 class NavObserver extends AutoRouterObserver {
@@ -23,6 +25,7 @@ class NavObserver extends AutoRouterObserver {
   @override
   void didReplace({Route? newRoute, Route? oldRoute}) {
     print('Replace ${newRoute!.settings.name}');
+
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
   }
 
@@ -47,44 +50,57 @@ class AppContext extends StatelessWidget {
     final database = DependenciesScope.dependenciesOf(context).database;
 
     return StreamBuilder<ThemeData>(
-        initialData: database.settingsDao.initialSettings.materialTheme,
-        stream: database.settingsDao.watchTheme(),
-        builder: (context, snapshot) => PlatformProvider(
-              settings: PlatformSettingsData(
-                iosUsesMaterialWidgets: true,
-                iosUseZeroPaddingForAppbarPlatformIcon: true,
+      initialData: database.settingsDao.initialSettings.materialTheme,
+      stream: database.settingsDao.watchTheme(),
+      builder: (context, snapshot) => PlatformProvider(
+        settings: PlatformSettingsData(
+          iosUsesMaterialWidgets: true,
+          iosUseZeroPaddingForAppbarPlatformIcon: true,
+        ),
+        builder: (context) {
+          final material = snapshot.data!;
+          final cup = MaterialBasedCupertinoThemeData(materialTheme: material).copyWith(
+            barBackgroundColor: material.colorScheme.background.withAlpha(230),
+            scaffoldBackgroundColor: material.colorScheme.background,
+            textTheme: CupertinoTextThemeData(
+              primaryColor: material.textTheme.bodyLarge!.color!,
+              navTitleTextStyle: TextStyle(color: material.textTheme.bodyLarge!.color),
+              navActionTextStyle: TextStyle(color: material.primaryColor),
+              actionTextStyle: TextStyle(color: material.primaryColor),
+              textStyle: TextStyle(
+                color: material.textTheme.bodyLarge!.color,
               ),
-              builder: (context) {
-                final material = snapshot.data!;
-                final cup = MaterialBasedCupertinoThemeData(materialTheme: material).copyWith(
-                  barBackgroundColor: material.colorScheme.background.withAlpha(230),
-                  scaffoldBackgroundColor: material.colorScheme.background,
-                  textTheme: CupertinoTextThemeData(
-                    primaryColor: material.textTheme.bodyLarge!.color!,
-                    navTitleTextStyle: TextStyle(color: material.textTheme.bodyLarge!.color),
-                    navActionTextStyle: TextStyle(color: material.primaryColor),
-                    actionTextStyle: TextStyle(color: material.primaryColor),
-                    textStyle: TextStyle(
-                      color: material.textTheme.bodyLarge!.color,
-                    ),
-                  ),
-                );
-                return PlatformTheme(
-                  materialLightTheme: material,
-                  materialDarkTheme: material,
-                  cupertinoLightTheme: cup,
-                  cupertinoDarkTheme: cup,
-                  builder: (ctx) => PlatformApp.router(
-                    routerConfig: router.config(
-                      navigatorObservers: () => [NavObserver()],
-                    ),
-                    debugShowCheckedModeBanner: false,
-                    supportedLocales: AppLocalization.supportedLocales,
-                    localizationsDelegates: AppLocalization.localizationsDelegates,
-                    locale: const Locale('ru'),
-                  ),
-                );
-              },
-            ),);
+            ),
+          );
+          return PlatformTheme(
+            materialLightTheme: material,
+            materialDarkTheme: material,
+            cupertinoLightTheme: cup,
+            cupertinoDarkTheme: cup,
+            builder: (ctx) => PlatformApp.router(
+              material: (context, platform) => MaterialAppRouterData(
+                theme: material,
+                darkTheme: material,
+                themeMode: ThemeMode.system,
+              ),
+              routerConfig: goRouter,
+              // .config(
+              //   // rebuildSt: true,
+              //   // rebuildStackOnDeepLink: true,
+              //   navigatorObservers: () => [NavObserver()],
+              //   // deepLinkBuilder: (deeplink) => DeepLink.path('catalogues/opds?name=Flibusta&url=https://flibusta.is/opds'),
+              //   // initialRoutes: [CataloguesRoute()],
+              //   // includePrefixMatches: true,
+              //   // deepLinkBuilder: (deeplink) => DeepLink.path('/test/opds?name=Flibusta&url=https://flibusta.is/opds'),
+              // ),
+              debugShowCheckedModeBanner: false,
+              supportedLocales: AppLocalization.supportedLocales,
+              localizationsDelegates: AppLocalization.localizationsDelegates,
+              locale: const Locale('ru'),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

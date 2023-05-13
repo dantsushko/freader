@@ -38,17 +38,6 @@ class AppDatabase extends _$AppDatabase {
               b
                 ..insertAll(themeEntries, [
                   ThemeEntriesCompanion.insert(
-                    name: 'Сумрак',
-                    accentColor: 0xFFFFC66D,
-                    textColor: 0xFF82B8E0,
-                    backgroundColor: 0xFF26292C,
-                    separatorColor: 0xFF565669,
-                    greyColor: 0xFFCDCDCD,
-                    controlColor: 0xFF2C3E50,
-                    highlightColor: 0xFF7299F9,
-                    secondaryTextColor: 0xFF6F9BBC,
-                  ),
-                  ThemeEntriesCompanion.insert(
                     name: 'Сепия',
                     accentColor: 0xFFF2473F,
                     textColor: 0xFF3D1C07,
@@ -59,6 +48,18 @@ class AppDatabase extends _$AppDatabase {
                     highlightColor: 0xFF7299F9,
                     secondaryTextColor: 0xFF614631,
                   ),
+                  ThemeEntriesCompanion.insert(
+                    name: 'Сумрак',
+                    accentColor: 0xFFFFC66D,
+                    textColor: 0xFF82B8E0,
+                    backgroundColor: 0xFF26292C,
+                    separatorColor: 0xFF565669,
+                    greyColor: 0xFFCDCDCD,
+                    controlColor: 0xFF2C3E50,
+                    highlightColor: 0xFF7299F9,
+                    secondaryTextColor: 0xFF6F9BBC,
+                  ),
+                  
                 ])
                 ..insertAll(
                   opdsCatalogueEntries,
