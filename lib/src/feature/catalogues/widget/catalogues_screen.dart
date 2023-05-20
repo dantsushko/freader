@@ -1,14 +1,13 @@
-import 'package:auto_route/auto_route.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:freader/src/core/router/router.gr.dart';
 import 'package:freader/src/feature/base/widget/catalogue_icon.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/mixin/context_menu_mixin.dart';
 import 'add_opds_dialog.dart';
 
-@RoutePage()
 class CataloguesScreen extends StatefulWidget {
   const CataloguesScreen({super.key});
 
@@ -57,7 +56,7 @@ class _CataloguesScreenState extends State<CataloguesScreen> with ContextMenuMix
                 (opds) => GestureDetector(
                   onTapDown: getTapPosition,
                   onTapUp: (details) =>
-                      context.router.push(OpdsRoute(url: opds.url, name: opds.name)),
+                      context.goNamed('opds', extra: {'url': opds.url, 'name': opds.name}),
                   onLongPress: () => showContextMenu(context, [
                     PopupMenuItem(
                       child: const Text('Правка'),

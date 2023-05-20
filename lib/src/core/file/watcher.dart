@@ -24,7 +24,6 @@ class FileWatcher {
     }
   }
   Future<void> onEvent(WatchEvent event, String dir) async {
-    l.i(event);
     if (event.type == ChangeType.ADD) {
       if (isBook(event.path)) {
         final parsedBook = await Parser().parse(event.path);

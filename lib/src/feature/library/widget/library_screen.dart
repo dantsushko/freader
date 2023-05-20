@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:auto_route/auto_route.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:freader/src/core/constants/constants.dart';
-import 'package:freader/src/core/router/router.gr.dart';
+
 import 'package:freader/src/core/utils/downloader.dart';
 import 'package:freader/src/feature/base/widget/catalogue_icon.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
 
@@ -41,7 +41,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   ),
                   childrenDelegate: SliverChildListDelegate([
                     InkWell(
-                      onTap: () => context.router.push(DirectoryContentRoute(directoryPath: baseBookDirPath)),
+                      onTap: () => context.goNamed('directory_content', extra: {'directoryPath': baseBookDirPath}),
                       child: const CatalogueIcon(name: 'Local', icon: Icons.smartphone),),
                   ]),
                 ),

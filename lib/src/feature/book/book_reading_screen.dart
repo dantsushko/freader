@@ -1,19 +1,19 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:freader/src/core/data/database/daos/book_dao.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/parser/parser.dart';
+import 'package:freader/src/feature/book/epub/epub_screen.dart';
 import 'package:freader/src/feature/catalogues/opds/util.dart';
+import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
+import 'blocs/navigator/bloc/reader_navigator_bloc.dart';
 import 'fb2/fb2_screen.dart';
-import 'settings/book_settings_screen.dart';
+import 'floating_app_bar.dart';
 
-@RoutePage()
 class BookReadingScreen extends StatefulWidget {
-  const BookReadingScreen({required this.bookWithMetadata, super.key});
-  final BookWithMetadata bookWithMetadata;
+  const BookReadingScreen({required this.bookId, super.key});
+  final int bookId;
   @override
   State<BookReadingScreen> createState() => _BookReadingScreenState();
 }
@@ -45,18 +45,26 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
     // if (_showAppBar) {
     // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
     // } else {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack, overlays: SystemUiOverlay.values);
     // }
   }
 
   ValueNotifier<bool> showControls = ValueNotifier<bool>(false);
   BookFormat format = BookFormat.unsupported;
   late final Future<CommonBook?> _compute;
+  late final AppDatabase _db;
   @override
   void initState() {
-    _compute = compute(Parser().parse, widget.bookWithMetadata.book.filepath);
+    _db = DependenciesScope.dependenciesOf(context).database;
+    _compute = getBook();
     initAppBar();
     super.initState();
+  }
+
+  Future<CommonBook?> getBook() async {
+    final bookWithMetadata = await _db.bookDao.getBook(widget.bookId);
+    await _db.bookDao.updateTimestamp(widget.bookId);
+    return compute(Parser().parse, bookWithMetadata.book.filepath);
   }
 
   Stopwatch stopwatch = Stopwatch();
@@ -77,98 +85,42 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
               left: false,
               right: false,
               child: Scaffold(
-                body: Stack(
-                  children: [
-                    Builder(
-                      builder: (context) {
-                        if (snapshot.hasError) {
-                          return Center(child: Text(snapshot.error.toString()));
-                        }
-                        if (snapshot.hasData) {
-                          final book = snapshot.data!;
-                          return Screen(book: book);
-                        }
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                    ),
-                    ValueListenableBuilder(
-                      valueListenable: showControls,
-                      builder: (ctx, show, child) {
-                        if (!show) return const SizedBox.shrink();
-                        return Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          height: 30,
-                          child: AppBar(
-                            title: Text(
-                              snapshot.data?.title ?? '',
-                            ),
-                            leading: InkWell(
-                              onTap: () => context.router.pop(),
-                              child: const Icon(
-                                Icons.close,
-                              ),
-                            ),
-                            actions: [
-                              InkWell(
-                                onTap: () => showModalBottomSheet<void>(
-                                  isScrollControlled: true,
-                                  context: context,
-                                  builder: (ctx) => SizedBox(
-                                    height: MediaQuery.of(context).size.height * 0.8,
-                                    child: const BookSettingsScren(),
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.settings,
-                                ),
-                              ),
-                              const Icon(
-                                Icons.menu_book_sharp,
-                              ),
-                            ],
+                body: Builder(
+                  builder: (context) {
+                    if (snapshot.hasError) {
+                      return Center(child: Text(snapshot.error.toString()));
+                    }
+                    if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                    final book = snapshot.data!;
+                    return BlocProvider(
+                      create: (context) => ReaderNavigatorBloc(book),
+                      child: Stack(
+                        children: [
+                          Builder(
+                            builder: (context) {
+                              
+                              if (book.fb2book != null) {
+                                return FB2Screen(book: book.fb2book!);
+                              }
+                              if (book.epubBook != null) {
+                                return EpubScreen(book: book.epubBook!);
+                              }
+
+                              return const Center(child: CircularProgressIndicator());
+                            },
                           ),
-                        );
-                      },
-                    ),
-                  ],
+                          FloatingAppBar(
+                              showControls: showControls,
+                              title: snapshot.data?.title ?? '',
+                              book: snapshot.data),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
           ),
         ),
       );
-}
-
-class Screen extends StatelessWidget {
-  const Screen({
-    required this.book,
-    super.key,
-  });
-
-  final CommonBook book;
-
-  @override
-  Widget build(BuildContext context) {
-    if (book.fb2book != null) {
-      return FB2Screen(book: book.fb2book!);
-    }
-    if (book.epubBook != null) {
-      return ListView(
-        children: [
-          Center(
-            child: Text(
-              book.title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-          ...book.epubBook!.Content?.Html?.values
-                  .map((e) => SelectableHtml(data: e.Content ?? '')) ??
-              []
-        ],
-      );
-    }
-    return const Center(child: Text('Unsupported format'));
-  }
 }

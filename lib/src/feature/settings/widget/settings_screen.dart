@@ -1,11 +1,12 @@
-import 'package:auto_route/auto_route.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:freader/src/core/router/router.gr.dart';
+
+import 'package:freader/src/feature/settings/iap/widget/iap_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-@RoutePage()
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -33,7 +34,7 @@ class SettingsScreen extends StatelessWidget {
               SettingsSection(
                 tiles: [
                   SettingsTile.navigation(
-                    onPressed: (ctx) => context.router.pushNamed('iap'),
+                    onPressed: (ctx) => GoRouter.of(context).push('/settings/iap'),
                     trailing: const Icon(
                       Icons.arrow_forward_ios,
                       size: 16,
@@ -50,7 +51,7 @@ class SettingsScreen extends StatelessWidget {
                       Icons.arrow_forward_ios,
                       size: 16,
                     ),
-                    onPressed: (ctx) => context.router.pushNamed('iap'),
+                    onPressed: (ctx) => GoRouter.of(context).push('/settings/iap'),
                     title: const Text('Словари'),
                   ),
                   SettingsTile.navigation(
@@ -61,7 +62,7 @@ class SettingsScreen extends StatelessWidget {
                     // onPressed: (ctx) => context.navigateTo(
                         // CataloguesTab(children: [OpdsRoute(name: 'Flibusta', url: 'https://flibusta.is/opds')])),
 
-                    onPressed: (ctx) => context.router.pushAll([ BaseRoute(), CataloguesRoute(), OpdsRoute()]),
+                    onPressed: (ctx) => context.go('opds?name=Flibusta&url=https://flibusta.is/opds'),
                     title: const Text('Загрузки'),
                   ),
                   SettingsTile.navigation(
@@ -69,7 +70,7 @@ class SettingsScreen extends StatelessWidget {
                       Icons.arrow_forward_ios,
                       size: 16,
                     ),
-                    onPressed: (ctx) => context.router.pushNamed('iap'),
+                    onPressed: (ctx) => GoRouter.of(context).push('/settings/iap'),
                     title: const Text('Синхронизация'),
                   )
                 ],
@@ -82,7 +83,7 @@ class SettingsScreen extends StatelessWidget {
                       Icons.arrow_forward_ios,
                       size: 16,
                     ),
-                    onPressed: (ctx) => context.router.pushNamed('iap'),
+                    onPressed: (ctx) => GoRouter.of(context).push('/settings/iap'),
                     title: const Text('Читалка'),
                   ),
                   SettingsTile.navigation(
@@ -90,7 +91,7 @@ class SettingsScreen extends StatelessWidget {
                       Icons.arrow_forward_ios,
                       size: 16,
                     ),
-                    onPressed: (ctx) => context.router.pushNamed('iap'),
+                    onPressed: (ctx) => GoRouter.of(context).push('/settings/iap'),
                     title: const Text('Сервис перевода'),
                   ),
                   SettingsTile.navigation(
@@ -98,7 +99,7 @@ class SettingsScreen extends StatelessWidget {
                       Icons.arrow_forward_ios,
                       size: 16,
                     ),
-                    onPressed: (ctx) => context.router.pushNamed('themes'),
+                    onPressed: (ctx) => GoRouter.of(context).push('/settings/themes'),
                     title: const Text('Темы'),
                   ),
                 ],
@@ -110,7 +111,7 @@ class SettingsScreen extends StatelessWidget {
                       Icons.arrow_forward_ios,
                       size: 16,
                     ),
-                    onPressed: (ctx) => context.router.pushNamed('iap'),
+                    onPressed: (ctx) => GoRouter.of(context).push('/settings/iap'),
                     title: const Text('О программе'),
                   )
                 ],

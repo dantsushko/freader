@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:freader/src/core/parser/fb2_parser/model/element.dart';
 import 'package:xml/xml.dart';
 
 enum FB2ImageType { png, jpeg }
 
-class FB2Image {
+class FB2Image extends FB2Element{
   FB2Image(XmlElement image) {
     base64 = image.innerText;
     type = image.getAttribute('content-type') == 'image/png' ? FB2ImageType.png : FB2ImageType.jpeg;

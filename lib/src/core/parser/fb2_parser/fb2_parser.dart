@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:freader/src/core/parser/fb2_parser/model/author.dart';
+import 'package:freader/src/core/parser/fb2_parser/model/element.dart';
 import 'package:xml/xml.dart';
 
 import 'model/body.dart';
@@ -15,22 +16,23 @@ class FB2Book {
     required this.description,
     required this.body,
     required this.images,
-    required this.links,
     required this.wordCount,
   });
   final FB2Description description;
   final FB2Body body;
   final List<FB2Image> images;
-  final Map<String, FB2Link> links;
   final int wordCount;
   List<FB2Author> get authors => description.titleInfo.authors;
   String get bookTitle => description.titleInfo.bookTitle;
   String? get language => description.titleInfo.language;
   List<String> get genres => description.titleInfo.genres;
   FB2Image get cover =>
-      images.firstWhereOrNull((element) => element.name == 'cover.jpg') ?? FB2Image.empty();
+      images.firstWhereOrNull((element) => element.name == 'cover.jpg') ??
+      images.firstOrNull ??
+      FB2Image.empty();
 
   String? get publishDate => description.titleInfo.publishDate.toString();
+  late final List<FB2Element> elements;
 }
 
 Future<FB2Book> parseFB2(Uint8List bytes) async {
@@ -39,13 +41,18 @@ Future<FB2Book> parseFB2(Uint8List bytes) async {
   final images = root.findAllElements('binary').map(FB2Image.new).toList();
   final description = FB2Description(root.getElement('description')!);
   final body = FB2Body(root.getElement('body')!);
-  final links = {
-    for (var e in root
-        .findAllElements('section')
-        .where((element) => element.getAttribute('id') != null)
-        .map(FB2Link.new))
-      '#${e.name}': e
-  };
-  final wordCount = body.sections.map((e) => e.wordCount).reduce((value, element) => value + element);
-  return FB2Book(body: body, description: description, images: images, links: links, wordCount: wordCount);
+  final allNotes =
+      body.sections.map((e) => e.links).expand((element) => element.map((e) => e)).toList();
+  final allNoteValues =
+      root.findAllElements('section').where((element) => element.getAttribute('id') != null);
+  for (final note in allNotes) {
+    final noteValue = allNoteValues
+        .firstWhere((element) => element.getAttribute('id') == note.name.replaceAll('#', ''));
+    note.value = noteValue.getElement('p')?.innerText ?? '';
+  }
+
+  final wordCount =
+      body.sections.map((e) => e.wordCount).reduce((value, element) => value + element);
+  return FB2Book(body: body, description: description, images: images, wordCount: wordCount)
+    ..elements = body.sections.expand((e) => e.children).toList();
 }

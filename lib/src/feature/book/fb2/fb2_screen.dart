@@ -1,10 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freader/src/core/data/database/daos/settings_dao.dart';
+import 'package:freader/src/core/data/database/tables.dart';
 import 'package:freader/src/core/parser/fb2_parser/fb2_parser.dart';
+import 'package:freader/src/core/parser/fb2_parser/model/element.dart';
+import 'package:freader/src/core/parser/fb2_parser/model/image.dart';
+import 'package:freader/src/core/parser/fb2_parser/model/link.dart';
+import 'package:freader/src/core/parser/fb2_parser/model/section.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:xml/xml.dart';
+
+import '../../../core/parser/fb2_parser/model/title.dart';
+import '../blocs/navigator/bloc/reader_navigator_bloc.dart';
 
 class FB2Screen extends StatefulWidget {
   const FB2Screen({
@@ -18,106 +28,8 @@ class FB2Screen extends StatefulWidget {
 }
 
 class _FB2ScreenState extends State<FB2Screen> {
+  final ItemScrollController _scrollController = ItemScrollController();
   late final FB2Book book;
-  Widget _buildParagraphWidget(XmlElement element) {
-    final textSpans = <InlineSpan>[];
-
-    for (final node in element.children) {
-      if (node is XmlText) {
-        textSpans.add(TextSpan(text: node.toString(), 
-        
-        style: TextStyle(
-          overflow: TextOverflow.ellipsis,
-          letterSpacing: letterSpacing,
-          
-          fontSize: fontSize)));
-      } else if (node is XmlElement) {
-        if (node.name.local == 'emphasis') {
-          textSpans.add(
-            TextSpan(
-              text: node.innerText,
-              style: TextStyle(fontStyle: FontStyle.italic, fontSize: fontSize),
-            ),
-          );
-        } else if (node.name.local == 'a') {
-          final href = node.getAttribute('l:href');
-          final link = book.links[href];
-
-          textSpans.add(
-            WidgetSpan(
-              child: Tooltip(
-                triggerMode: TooltipTriggerMode.tap,
-                verticalOffset: 10,
-                preferBelow: false,
-                waitDuration: Duration.zero,
-                showDuration: const Duration(seconds: 10),
-                richMessage: TextSpan(children: [TextSpan(text: link?.text ?? 'Link')]),
-                child: Text(
-                  node.innerText,
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                    color: Theme.of(context).primaryColor,
-                    fontSize: fontSize,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }
-      }
-    }
-
-    return SelectableText.rich(
-    
-      TextSpan(
-        
-        children: textSpans,
-      ),
-    );
-  }
-
-  Widget _buildWidget(XmlElement element) {
-    if (element.name.local == 'section') {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        
-        children: element.childElements.map(_buildWidget).toList(),
-      );
-    } else if (element.name.local == 'title') {
-      final paragraphs = element.findElements('p').map((p) => p.innerText).toList();
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: paragraphs
-            .map(
-              (paragraph) => Text(
-                paragraph,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize),
-              ),
-            )
-            .toList(),
-      );
-    } else if (element.name.local == 'empty-line') {
-      return const SizedBox(height: 16);
-    } else if (element.name.local == 'image') {
-      final imageUrl = element.getAttribute('l:href')!.replaceAll('#', '');
-      final image = book.images.firstWhere((element) => element.name == imageUrl);
-      return Padding(
-        padding: const EdgeInsets.all(8),
-        child: Image.memory(image.bytes),
-      );
-    } else if (element.name.local == 'subtitle') {
-      return Center(
-        child: Text(
-          element.innerText,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: subtitleFontSize),
-        ),
-      );
-    } else if (element.name.local == 'p') {
-      return _buildParagraphWidget(element);
-    }
-    return const SizedBox.shrink();
-  }
-
   late SettingsModel settings;
   double get fontSize => settings.fontSize.toDouble();
   double get subtitleFontSize => fontSize + 2;
@@ -125,8 +37,10 @@ class _FB2ScreenState extends State<FB2Screen> {
   double get pageHorizontalPadding => settings.pageHorizontalPadding.toDouble();
   double get pageTopPadding => settings.pageTopPadding.toDouble();
   double get pageBottomPadding => settings.pageBottomPadding.toDouble();
-  double get letterSpacing => settings.letterSpacing.toDouble(); 
-  late final StreamSubscription subscription;
+  double get letterSpacing => settings.letterSpacing.toDouble();
+  PageScrollStyle get pageScrollStyle => settings.pageScrollStyle;
+  late final StreamSubscription<SettingsModel> subscription;
+
   @override
   void initState() {
     settings = DependenciesScope.dependenciesOf(context).database.settingsDao.initialSettings;
@@ -145,19 +59,110 @@ class _FB2ScreenState extends State<FB2Screen> {
     super.dispose();
   }
 
+  List<XmlElement> bookPages = [XmlElement(XmlName('p'), [], [])];
+
+  Widget getScrollingWidget() {
+    switch (pageScrollStyle) {
+      case PageScrollStyle.scroll:
+        return ScrollablePositionedList.builder(
+            itemCount: book.elements.length,
+            itemScrollController: _scrollController,
+            // itemBuilder: (context, index) => _buildWidget(book.body.sections[index].content),
+            itemBuilder: (context, index) {
+              return _buildWidget(book.elements[index]);
+            }
+            // children: [
+            //   Image.memory(book.cover.bytes),
+            //   Text(book.body.epigraph ?? '', style: TextStyle(fontSize: fontSize)),
+            //   ....map((e) => _buildWidget(e.content)),
+            // ],
+            );
+
+      case PageScrollStyle.shift:
+        return PageView.builder(
+          itemCount: bookPages.length,
+          itemBuilder: (context, index) => Text(bookPages[index].toString()),
+        );
+      default:
+        return Center(child: Text('Unsupported scroll style: $pageScrollStyle'));
+    }
+  }
+
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.only(
-            left: pageHorizontalPadding,
-            right: pageHorizontalPadding,
-            top: pageTopPadding,
-            bottom: pageBottomPadding,),
-        child: ListView(
-          children: [
-            Image.memory(book.cover.bytes),
-            Text(book.body.epigraph ?? '', style: TextStyle(fontSize: fontSize)),
-            ...book.body.sections.map((e) => _buildWidget(e.content))
-          ],
-        ),
+  Widget build(BuildContext context) => BlocListener<ReaderNavigatorBloc, ReaderNavigatorState>(
+        listener: (context, state) {
+          print(state.chapterIndex);
+          
+          _scrollController.jumpTo(index: state.chapterIndex, alignment: 0);
+          // Scrollable.ensureVisible(state.chapterKey.currentContext!);
+        },
+        child: Padding(
+            padding: EdgeInsets.only(
+              left: pageHorizontalPadding,
+              right: pageHorizontalPadding,
+              top: pageTopPadding,
+              bottom: pageBottomPadding,
+            ),
+            child: getScrollingWidget()),
       );
+
+  Widget _buildWidget(FB2Element element) {
+    if (element is FB2Image) {
+      return Image.memory(element.bytes);
+    }
+    if (element is FB2Title) {
+      return Text(element.text,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize));
+    }
+    if (element is FB2Subtitle) {
+      return Center(
+        child: Text(element.text,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: subtitleFontSize)),
+      );
+    }
+    if (element is FB2EmtpyLine) {
+      return const SizedBox(height: 16);
+    }
+    if (element is FB2Paragraph) {
+      final textSpans = <InlineSpan>[];
+      for (final e in element.elements) {
+        if (e is FB2Text) {
+          textSpans.add(TextSpan(
+              text: e.text,
+              style: TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  letterSpacing: letterSpacing,
+                  fontStyle: e.emphasis ? FontStyle.italic : FontStyle.normal,
+                  fontSize: fontSize)));
+        }
+        if (e is FB2Link) {
+          textSpans.add(WidgetSpan(
+            child: Tooltip(
+              triggerMode: TooltipTriggerMode.tap,
+              verticalOffset: 10,
+              preferBelow: false,
+              waitDuration: Duration.zero,
+              showDuration: const Duration(seconds: 10),
+              richMessage: TextSpan(children: [TextSpan(text: e.value ?? 'Link')]),
+              child: Text(
+                e.text,
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  color: Theme.of(context).primaryColor,
+                  fontSize: fontSize,
+                ),
+              ),
+            ),
+          ));
+        }
+      }
+      return SelectableText.rich(TextSpan(
+        children: textSpans,
+      ));
+    }
+    if (element is FB2Link && element.type != LinkType.note) {
+      return Text(element.value ?? 'Note');
+    }
+    return Text(element.runtimeType.toString());
+  }
 }

@@ -59,6 +59,7 @@ class Downloader {
   Future<void> startDownload(String url) async {
     downloadController.add(DownloadStatus(0, DownloadState.queued));
     final uri = await getRedirectedUri(url);
+    
     final task = await DownloadTask(url: uri, directory: 'Books/Downloads')
         .withSuggestedFilename(unique: true);
     await FileDownloader().download(task, onProgress: (progress) {

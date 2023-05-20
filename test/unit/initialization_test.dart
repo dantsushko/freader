@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:freader/src/core/router/router.dart';
+
 import 'package:freader/src/feature/initialization/logic/initialization_processor.dart';
 import 'package:freader/src/feature/initialization/logic/initialization_steps.dart';
 import 'package:freader/src/feature/initialization/model/initialization_hook.dart';
@@ -18,12 +18,7 @@ void main() {
               preferences: sharedPreferences,
             );
           },
-          'Init Router': (progress) {
-            final router = AppRouter();
-            return progress.copyWith(
-              router: router,
-            );
-          }
+          
         },
         factory: const _TestInitializationFactory(),
         hook: InitializationHook.setup(),
@@ -40,12 +35,7 @@ void main() {
             'Init Shared Preferences': (progress) async {
               throw Exception();
             },
-            'Init Router': (progress) {
-              final router = AppRouter();
-              return progress.copyWith(
-                router: router,
-              );
-            }
+            
           },
           factory: const _TestInitializationFactory(),
           hook: InitializationHook.setup(),

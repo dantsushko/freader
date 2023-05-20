@@ -6,7 +6,7 @@ typedef BuildScope<T extends Widget> = ScopeMixin<T> Function(Widget child);
 
 typedef BuildWidget = Widget Function(BuildContext context, Widget? child);
 
-@alwaysThrows
+
 Never _childIsNull() => throw ArgumentError.notNull('child');
 
 class ScopeProvider<T extends Widget> extends StatelessWidget {

@@ -1,52 +1,19 @@
-import 'package:auto_route/auto_route.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:freader/src/core/localization/app_localization.dart';
 import 'package:freader/src/core/router/go_router.dart';
-import 'package:freader/src/core/router/router.gr.dart';
+
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
-class NavObserver extends AutoRouterObserver {
-  @override
-  void didPush(Route route, Route? previousRoute) {
-    print('Push ${route.settings.name}');
 
-    super.didPush(route, previousRoute);
-  }
-
-  @override
-  void didPop(Route route, Route? previousRoute) {
-    print('Pop ${route.settings.name}');
-
-    super.didPop(route, previousRoute);
-  }
-
-  @override
-  void didReplace({Route? newRoute, Route? oldRoute}) {
-    print('Replace ${newRoute!.settings.name}');
-
-    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
-  }
-
-  @override
-  void didRemove(Route route, Route? previousRoute) {
-    print('Remove ${route.settings.name}');
-    super.didRemove(route, previousRoute);
-  }
-
-  @override
-  void didChangeTabRoute(TabPageRoute route, TabPageRoute previousRoute) {
-    print('Tab route: ${route.name}');
-  }
-}
 
 /// A widget which is responsible for providing the app context.
 class AppContext extends StatelessWidget {
   const AppContext({super.key});
   @override
   Widget build(BuildContext context) {
-    final router = DependenciesScope.dependenciesOf(context).router;
     final database = DependenciesScope.dependenciesOf(context).database;
 
     return StreamBuilder<ThemeData>(
@@ -84,15 +51,6 @@ class AppContext extends StatelessWidget {
                 themeMode: ThemeMode.system,
               ),
               routerConfig: goRouter,
-              // .config(
-              //   // rebuildSt: true,
-              //   // rebuildStackOnDeepLink: true,
-              //   navigatorObservers: () => [NavObserver()],
-              //   // deepLinkBuilder: (deeplink) => DeepLink.path('catalogues/opds?name=Flibusta&url=https://flibusta.is/opds'),
-              //   // initialRoutes: [CataloguesRoute()],
-              //   // includePrefixMatches: true,
-              //   // deepLinkBuilder: (deeplink) => DeepLink.path('/test/opds?name=Flibusta&url=https://flibusta.is/opds'),
-              // ),
               debugShowCheckedModeBanner: false,
               supportedLocales: AppLocalization.supportedLocales,
               localizationsDelegates: AppLocalization.localizationsDelegates,

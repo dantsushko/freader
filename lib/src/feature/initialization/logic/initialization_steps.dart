@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/file/watcher.dart';
-import 'package:freader/src/core/router/router.dart';
+import 'package:freader/src/core/router/go_router.dart';
+
 import 'package:freader/src/feature/initialization/model/initialization_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,19 +21,15 @@ mixin InitializationSteps {
   static final _dependencies = <String, StepAction>{
     'Init Shared Preferences': (progress) async {
       final sharedPreferences = await SharedPreferences.getInstance();
+      initRouter(prefs: sharedPreferences);
       return progress.copyWith(
         preferences: sharedPreferences,
-      );
-    },
-    'Init Router': (progress) {
-      final router = AppRouter();
-      return progress.copyWith(
-        router: router,
       );
     },
     'Init Database': (progress) async {
       final database = AppDatabase();
       await database.settingsDao.init();
+
       return progress.copyWith(
         database: database,
       );

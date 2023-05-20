@@ -1,23 +1,19 @@
 import 'dart:io';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:freader/src/core/router/router.gr.dart';
+
 import 'package:freader/src/core/utils/path.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path/path.dart' as path;
 
-import '../../feature/book/book_card/small_card.dart';
-import '../data/database/daos/book_dao.dart';
+import '../../book/book_card/small_card.dart';
+import '../../../core/data/database/daos/book_dao.dart';
 
-@RoutePage()
 class DirectoryContentScreen extends StatefulWidget {
-
   const DirectoryContentScreen({required this.directoryPath, super.key});
   final String directoryPath;
-
-
 
   @override
   State<DirectoryContentScreen> createState() => _DirectoryContentScreenState();
@@ -59,7 +55,8 @@ class _DirectoryContentScreenState extends State<DirectoryContentScreen> {
                     trailing: const Icon(Icons.chevron_right),
                     title: Text(path.basename(entity.path)),
                     onTap: () {
-                      context.router.push(DirectoryContentRoute(directoryPath: entity.path));
+                      context.pushNamed('directory_content',
+                          extra: {'directoryPath': entity.path},);
                     },
                   );
                 } else if (entity is BookWithMetadata) {
@@ -72,6 +69,3 @@ class _DirectoryContentScreenState extends State<DirectoryContentScreen> {
         ),
       );
 }
-
-
-

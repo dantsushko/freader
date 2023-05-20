@@ -12,7 +12,8 @@ class BookWithMetadata {
   final BookEntry book;
   final MetadataEntry metadata;
   @override
-  String toString() => 'BookWithMetadata(book: ${book.filename}, dir: ${book.directory} metadata: ${metadata.language})';
+  String toString() =>
+      'BookWithMetadata(book: ${book.filename}, dir: ${book.directory} metadata: ${metadata.language})';
 }
 
 @DriftAccessor(tables: [BookEntries, MetadataEntries])
@@ -32,21 +33,22 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
 
     final bid = await into(bookEntries).insert(newBook);
     final metaData = MetadataEntriesCompanion.insert(
-        bid: bid,
-        title: book.title,
-        language: book.language,
-        published: book.published,
-        annotation: book.annotation,
-        keywords: '',
-        source: '',
-        pagecount: 100,
-        wordcount: 100,
-        color: 25,
-        coverhash: 'coverhash',
-        specific: 'specific',
-        coverurl: 'coverurl',
-        downloadurl: 'downloadurl',
-        timestamp: 0,);
+      bid: bid,
+      title: book.title,
+      language: book.language,
+      published: book.published,
+      annotation: book.annotation,
+      keywords: '',
+      source: '',
+      pagecount: 100,
+      wordcount: 100,
+      color: 25,
+      coverhash: 'coverhash',
+      specific: 'specific',
+      coverurl: 'coverurl',
+      downloadurl: 'downloadurl',
+      timestamp: 0,
+    );
     await into(metadataEntries).insert(metaData);
   }
 
@@ -54,15 +56,49 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
     await (delete(bookEntries)..where((tbl) => tbl.filename.equals(fileName))).go();
   }
 
-  Stream<List<BookWithMetadata>> watchAll({String? directory}) {
+  Future<BookWithMetadata> getBook(int id) async {
+    final query = select(bookEntries).join([
+      leftOuterJoin(metadataEntries, metadataEntries.bid.equalsExp(bookEntries.bid)),
+    ])
+      ..where(bookEntries.bid.equals(id));
+    final book = await query.getSingle();
+    return BookWithMetadata(book.readTable(bookEntries), book.readTable(metadataEntries));
+  }
+
+  Stream<BookWithMetadata?> watchByFileName(String fileName) {
+    final query = select(bookEntries).join([
+      leftOuterJoin(metadataEntries, metadataEntries.bid.equalsExp(bookEntries.bid)),
+    ])
+      ..where(bookEntries.filename.equals(fileName));
+    return query.watchSingleOrNull().map(
+          (book) => book == null
+              ? null
+              : BookWithMetadata(book.readTable(bookEntries), book.readTable(metadataEntries)),
+        );
+  }
+
+  Stream<List<BookWithMetadata>> watchAll({String? directory, bool lastRead = false}) {
     final query = select(bookEntries).join([
       leftOuterJoin(metadataEntries, metadataEntries.bid.equalsExp(bookEntries.bid)),
     ]);
     if (directory != null) {
       query.where(bookEntries.directory.equals(directory));
     }
-    return query.watch().map((books) => books
-        .map((e) => BookWithMetadata(e.readTable(bookEntries), e.readTable(metadataEntries)))
-        .toList(),);
+    if (lastRead) {
+      query.orderBy([OrderingTerm.desc(metadataEntries.timestamp)]);
+      query.where(metadataEntries.timestamp.isBiggerThanValue(0));
+    }
+    return query.watch().map(
+          (books) => books
+              .map((e) => BookWithMetadata(e.readTable(bookEntries), e.readTable(metadataEntries)))
+              .toList(),
+        );
+  }
+
+  Future<void> updateTimestamp(int bookId) async {
+    await (update(metadataEntries)..where((tbl) => tbl.bid.equals(bookId)))
+        .write(MetadataEntriesCompanion(
+      timestamp: Value(DateTime.now().millisecondsSinceEpoch.toDouble()),
+    ));
   }
 }

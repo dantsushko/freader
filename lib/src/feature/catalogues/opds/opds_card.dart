@@ -1,7 +1,6 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:freader/src/core/router/router.gr.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../book/book_detail/book_detail.dart';
 import 'model/opds_entry.model.dart';
@@ -19,12 +18,8 @@ class OpdsCard extends StatelessWidget {
     final catalogLink =
         entry.links.firstWhereOrNull((link) => link is OpdsLinkCatalog) as OpdsLinkCatalog?;
     if (!entry.id!.contains(':book:')) {
-      context.router.push(
-        OpdsRoute(
-          url: catalogLink!.uri.toString(),
-          name: entry.title,
-        ),
-      );
+      context.pushNamed('opds',
+          extra: {'url': catalogLink!.uri.toString(), 'name': entry.title});
     } else {
       showModalBottomSheet<void>(
         context: context,

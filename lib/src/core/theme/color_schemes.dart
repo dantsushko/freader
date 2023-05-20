@@ -1,9 +1,22 @@
 
-import 'package:auto_route/auto_route.dart';
+
 import 'package:flutter/material.dart';
 
 import '../data/database/database.dart';
+class NoAnimationPageTransitionsBuilder extends PageTransitionsBuilder {
+  const NoAnimationPageTransitionsBuilder();
 
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return child;
+  }
+}
 ThemeData themeFromDB(ThemeEntry theme) => ThemeData(
       textTheme: ThemeData.light().textTheme.copyWith(
             bodyLarge: TextStyle(color: Color(theme.textColor)),
@@ -22,17 +35,17 @@ ThemeData themeFromDB(ThemeEntry theme) => ThemeData(
             labelMedium: TextStyle(color: Color(theme.secondaryTextColor)),
             labelSmall: TextStyle(color: Color(theme.secondaryTextColor)),
           ),
-          tooltipTheme: TooltipThemeData(
-            textStyle: TextStyle(color: Color(theme.backgroundColor)),
-            decoration: BoxDecoration(
-              color: Color(theme.controlColor),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-     pageTransitionsTheme: const PageTransitionsTheme(builders: {
-        TargetPlatform.iOS: NoShadowCupertinoPageTransitionsBuilder(),
-        TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
-      },),
+          // tooltipTheme: TooltipThemeData(
+          //   textStyle: TextStyle(color: Color(theme.backgroundColor)),
+          //   decoration: BoxDecoration(
+          //     color: Color(theme.controlColor),
+          //     borderRadius: BorderRadius.circular(8),
+          //   ),
+          // ),
+    //  pageTransitionsTheme: const PageTransitionsTheme(builders: {
+    //     TargetPlatform.iOS: NoAnimationPageTransitionsBuilder(),
+    //     TargetPlatform.android: NoAnimationPageTransitionsBuilder(),
+    //   },),
     textSelectionTheme: TextSelectionThemeData(selectionColor: Color(theme.highlightColor)),
       colorScheme: convertToColorScheme(theme),
       dividerColor: Color(theme.separatorColor), //divider
