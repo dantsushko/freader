@@ -15,6 +15,15 @@ void main() {
   final document = XmlDocument.parse(xmlString);
 
   for(final p in document.findAllElements('p')) {
-    print(p.children);
+    for(final child in p.children) {
+      if(child is XmlText) {
+        print(child.text);
+      }else{
+print(child.innerText);
+      }
+      // if(child is XmlElement && child.name.local == 'emphasis') {
+        
+      // }
+    }
   }
 }

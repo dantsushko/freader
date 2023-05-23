@@ -41,8 +41,10 @@ Future<FB2Book> parseFB2(Uint8List bytes) async {
   final images = root.findAllElements('binary').map(FB2Image.new).toList();
   final description = FB2Description(root.getElement('description')!);
   final body = FB2Body(root.getElement('body')!);
-  final allNotes =
-      body.sections.map((e) => e.links).expand((element) => element.map((e) => e)).toList();
+  final allNotes = body.sections
+      .map((e) => e.links.where((element) => element.type == LinkType.note))
+      .expand((element) => element.map((e) => e))
+      .toList();
   final allNoteValues =
       root.findAllElements('section').where((element) => element.getAttribute('id') != null);
   for (final note in allNotes) {
@@ -53,6 +55,8 @@ Future<FB2Book> parseFB2(Uint8List bytes) async {
 
   final wordCount =
       body.sections.map((e) => e.wordCount).reduce((value, element) => value + element);
-  return FB2Book(body: body, description: description, images: images, wordCount: wordCount)
-    ..elements = body.sections.expand((e) => e.children).toList();
+  final book = FB2Book(body: body, description: description, images: images, wordCount: wordCount);
+
+  book.elements = [book.cover, ...body.sections.expand((e) => e.children)];
+  return book;
 }

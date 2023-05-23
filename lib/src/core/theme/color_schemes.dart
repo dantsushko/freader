@@ -46,7 +46,9 @@ ThemeData themeFromDB(ThemeEntry theme) => ThemeData(
     //     TargetPlatform.iOS: NoAnimationPageTransitionsBuilder(),
     //     TargetPlatform.android: NoAnimationPageTransitionsBuilder(),
     //   },),
-    textSelectionTheme: TextSelectionThemeData(selectionColor: Color(theme.highlightColor)),
+    textSelectionTheme: TextSelectionThemeData(
+      selectionHandleColor: Color(theme.highlightColor),
+      selectionColor: Color(theme.highlightColor).withOpacity(0.6)),
       colorScheme: convertToColorScheme(theme),
       dividerColor: Color(theme.separatorColor), //divider
       brightness: Brightness.light,

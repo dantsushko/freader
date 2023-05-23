@@ -88,7 +88,7 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                 body: Builder(
                   builder: (context) {
                     if (snapshot.hasError) {
-                      return Center(child: Text(snapshot.error.toString()));
+                      throw(Exception(snapshot.stackTrace));
                     }
                     if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                     final book = snapshot.data!;
@@ -98,7 +98,6 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                         children: [
                           Builder(
                             builder: (context) {
-                              
                               if (book.fb2book != null) {
                                 return FB2Screen(book: book.fb2book!);
                               }

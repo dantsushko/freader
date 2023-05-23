@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freader/src/core/data/database/daos/settings_dao.dart';
@@ -10,6 +11,7 @@ import 'package:freader/src/core/parser/fb2_parser/model/image.dart';
 import 'package:freader/src/core/parser/fb2_parser/model/link.dart';
 import 'package:freader/src/core/parser/fb2_parser/model/section.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
+
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:xml/xml.dart';
 
@@ -67,14 +69,11 @@ class _FB2ScreenState extends State<FB2Screen> {
         return ScrollablePositionedList.builder(
             itemCount: book.elements.length,
             itemScrollController: _scrollController,
-            // itemBuilder: (context, index) => _buildWidget(book.body.sections[index].content),
-            itemBuilder: (context, index) {
-              return _buildWidget(book.elements[index]);
-            }
+            itemBuilder: (context, index) => _buildFB2ElementWidget(book.elements[index])
             // children: [
             //   Image.memory(book.cover.bytes),
             //   Text(book.body.epigraph ?? '', style: TextStyle(fontSize: fontSize)),
-            //   ....map((e) => _buildWidget(e.content)),
+            //   ....map((e) => _buildFB2ElementWidget(e.content)),
             // ],
             );
 
@@ -91,22 +90,21 @@ class _FB2ScreenState extends State<FB2Screen> {
   @override
   Widget build(BuildContext context) => BlocListener<ReaderNavigatorBloc, ReaderNavigatorState>(
         listener: (context, state) {
-          print(state.chapterIndex);
-          
           _scrollController.jumpTo(index: state.chapterIndex, alignment: 0);
-          // Scrollable.ensureVisible(state.chapterKey.currentContext!);
         },
-        child: Padding(
-            padding: EdgeInsets.only(
-              left: pageHorizontalPadding,
-              right: pageHorizontalPadding,
-              top: pageTopPadding,
-              bottom: pageBottomPadding,
-            ),
-            child: getScrollingWidget()),
+        child: SelectionArea(
+          child: Padding(
+              padding: EdgeInsets.only(
+                left: pageHorizontalPadding,
+                right: pageHorizontalPadding,
+                top: pageTopPadding,
+                bottom: pageBottomPadding,
+              ),
+              child: getScrollingWidget()),
+        ),
       );
 
-  Widget _buildWidget(FB2Element element) {
+  Widget _buildFB2ElementWidget(FB2Element element) {
     if (element is FB2Image) {
       return Image.memory(element.bytes);
     }
@@ -124,26 +122,24 @@ class _FB2ScreenState extends State<FB2Screen> {
       return const SizedBox(height: 16);
     }
     if (element is FB2Paragraph) {
-      final textSpans = <InlineSpan>[];
+      final spans = <InlineSpan>[];
       for (final e in element.elements) {
         if (e is FB2Text) {
-          textSpans.add(TextSpan(
-              text: e.text,
+          spans.add(TextSpan(text:e.text,
               style: TextStyle(
-                  overflow: TextOverflow.ellipsis,
                   letterSpacing: letterSpacing,
                   fontStyle: e.emphasis ? FontStyle.italic : FontStyle.normal,
                   fontSize: fontSize)));
         }
         if (e is FB2Link) {
-          textSpans.add(WidgetSpan(
+          spans.add(WidgetSpan(
             child: Tooltip(
               triggerMode: TooltipTriggerMode.tap,
               verticalOffset: 10,
               preferBelow: false,
               waitDuration: Duration.zero,
               showDuration: const Duration(seconds: 10),
-              richMessage: TextSpan(children: [TextSpan(text: e.value ?? 'Link')]),
+              richMessage: TextSpan(text: e.value ?? 'Link'),
               child: Text(
                 e.text,
                 style: TextStyle(
@@ -156,9 +152,10 @@ class _FB2ScreenState extends State<FB2Screen> {
           ));
         }
       }
-      return SelectableText.rich(TextSpan(
-        children: textSpans,
-      ));
+      return Text.rich(
+        TextSpan(children: spans),
+      );
+    
     }
     if (element is FB2Link && element.type != LinkType.note) {
       return Text(element.value ?? 'Note');

@@ -3,7 +3,7 @@ import 'package:xml/xml.dart';
 
 class FB2Title extends FB2Element {
   int index;
-  FB2Title(this.index,XmlElement element) {
+  FB2Title(this.index, XmlElement element) {
     text = element.findAllElements('p').map((e) => e.innerText).join('\n');
   }
   late final String text;

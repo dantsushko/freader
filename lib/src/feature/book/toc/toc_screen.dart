@@ -10,16 +10,19 @@ class TocScreen extends StatefulWidget {
   State<TocScreen> createState() => _TocScreenState();
 }
 
-
 class _TocScreenState extends State<TocScreen> {
   @override
-  Widget build(BuildContext context) {
-    return ListView(
-
-      children: widget.toc?.chapters.map((e) => ListTile(
-        
-        onTap: () => context.read<ReaderNavigatorBloc>().add(ReaderNavigatorEvent.goToChapter(e.index)),
-        title: Text(e.title))).toList() ?? [],
-    );
-  }
+  Widget build(BuildContext context) => ListView(
+        children: widget.toc?.chapters
+                .map(
+                  (e) => ListTile(
+                    onTap: () => context
+                        .read<ReaderNavigatorBloc>()
+                        .add(ReaderNavigatorEvent.goToChapter(e.index)),
+                    title: Text(e.title),
+                  ),
+                )
+                .toList() ??
+            [],
+      );
 }
