@@ -20,8 +20,8 @@ class _CatalogueIconState extends State<CatalogueIcon> {
         child: Column(
           children: [
             Container(
-              width: 64,
-              height: 64,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 color: Theme.of(context).textTheme.bodyLarge!.color,
                 shape: BoxShape.circle,
@@ -29,10 +29,10 @@ class _CatalogueIconState extends State<CatalogueIcon> {
               child:  Icon(
                 widget.icon ?? Icons.camera,
                 color: Theme.of(context).iconTheme.color,
-                size: 40,
+                size: 50,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               widget.name,
               textAlign: TextAlign.center,
@@ -56,8 +56,8 @@ class AddCatalogueIcon extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              width: 64,
-              height: 64,
+              width: 80,
+              height: 80,
               decoration:  BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
@@ -65,7 +65,7 @@ class AddCatalogueIcon extends StatelessWidget {
               child:  Icon(
                 Icons.add,
                 color: Theme.of(context).colorScheme.background,
-                size: 32,
+                size: 40,
               ),
             ),
           ],

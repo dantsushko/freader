@@ -88,8 +88,8 @@ class _CataloguesScreenState extends State<CataloguesScreen> with ContextMenuMix
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 2,
             ),
             itemCount: gridChildren.length,
             itemBuilder: (context, index) => gridChildren[index],

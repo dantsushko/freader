@@ -127,6 +127,7 @@ class _FB2ScreenState extends State<FB2Screen> {
         if (e is FB2Text) {
           spans.add(TextSpan(text:e.text,
               style: TextStyle(
+                  wordSpacing: 4,
                   letterSpacing: letterSpacing,
                   fontStyle: e.emphasis ? FontStyle.italic : FontStyle.normal,
                   fontSize: fontSize)));

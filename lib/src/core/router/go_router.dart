@@ -45,8 +45,8 @@ void initRouter({required SharedPreferences prefs}) {
       if (extraString == null) {
         await prefs.setString('extra', jsonEncode(state.extra));
       } else {
-        final extra = (jsonDecode(extraString) as Map<String, dynamic>)
-          ..addAll(state.extra as Map<String, dynamic>? ?? {});
+        final extra = jsonDecode(extraString) as Map<String, dynamic>? ?? {};
+        extra.addAll(state.extra as Map<String, dynamic>? ?? {});
         await prefs.setString('extra', jsonEncode(extra));
       }
     },
@@ -59,23 +59,28 @@ void initRouter({required SharedPreferences prefs}) {
         path: '/',
         redirect: (context, state) => '/reading',
       ),
-      
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => BaseScreen(
           child: child,
         ),
         routes: [
-
           GoRoute(
             name: 'reading',
             path: '/reading',
-            builder: (context, state) => const ReadingScreen(),
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const ReadingScreen(),
+            ),
+            // builder: (context, state) => const ReadingScreen(),
           ),
           GoRoute(
               name: 'library',
               path: '/library',
-              builder: (context, state) => const LibraryScreen(),
+               pageBuilder: (context, state) => NoTransitionPage<void>(
+                    key: state.pageKey,
+                    child: const LibraryScreen(),
+                  ),
               routes: [
                 GoRoute(
                     name: 'directory_content',
@@ -90,14 +95,15 @@ void initRouter({required SharedPreferences prefs}) {
                           path: 'book',
                           builder: (context, state) =>
                               BookReadingScreen(bookId: state.extra!.getExtra<int>('id'))),
-                    ]
-                    ),
-                    
+                    ]),
               ]),
           GoRoute(
             name: 'catalogues',
             path: '/catalogues',
-            builder: (context, state) => const CataloguesScreen(),
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const CataloguesScreen(),
+            ),
             routes: [
               GoRoute(
                 name: 'opds',
@@ -112,7 +118,10 @@ void initRouter({required SharedPreferences prefs}) {
           GoRoute(
             name: 'settings',
             path: '/settings',
-            builder: (context, state) => const SettingsScreen(),
+                       pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const SettingsScreen(),
+            ),
             routes: [
               GoRoute(
                 name: 'iap',

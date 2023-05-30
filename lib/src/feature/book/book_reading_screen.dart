@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/parser/parser.dart';
@@ -42,11 +43,11 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
   }
 
   void initAppBar() {
-    // if (_showAppBar) {
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
-    // } else {
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack, overlays: SystemUiOverlay.values);
-    // }
+    if (showControls.value) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+    } else {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack, overlays: SystemUiOverlay.values);
+    }
   }
 
   ValueNotifier<bool> showControls = ValueNotifier<bool>(false);
@@ -93,7 +94,7 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                     if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                     final book = snapshot.data!;
                     return BlocProvider(
-                      create: (context) => ReaderNavigatorBloc(book),
+                      create: (context) => ReaderNavigatorBloc(),
                       child: Stack(
                         children: [
                           Builder(

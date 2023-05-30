@@ -11,10 +11,6 @@ import 'package:path_provider/path_provider.dart';
 Future<File> get databaseFile async {
   final appDir = await getApplicationDocumentsDirectory();
   final dbPath = p.join(appDir.path, 'freader.db');
-  // print(dbPath);
-  // if(File(dbPath).existsSync()){
-  //   File(dbPath).deleteSync();
-  // }
   return File(dbPath);
 }
 

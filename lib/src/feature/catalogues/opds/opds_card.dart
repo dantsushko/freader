@@ -59,7 +59,7 @@ class OpdsCard extends StatelessWidget {
         onTap: () => _handleCardTap(context),
         child: Card(
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

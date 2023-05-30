@@ -52,10 +52,10 @@ class _OpdsViewerState extends State<OpdsViewer> {
   Widget build(BuildContext context) => RefreshIndicator(
     displacement: 20,
     onRefresh: () => Future.sync( _pagingController.refresh),
-    child: PagedListView<int, OpdsEntry>.separated(
+    child: PagedListView<int, OpdsEntry>(
           pagingController: _pagingController,
           shrinkWrap: true,
-          separatorBuilder: (context, index) => Divider(color: Theme.of(context).dividerColor,),
+          // separatorBuilder: (context, index) => Divider(color: Theme.of(context).dividerColor,),
           builderDelegate: PagedChildBuilderDelegate<OpdsEntry>(
             itemBuilder: (context, item, index) => OpdsCard(
               entry: item,

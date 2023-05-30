@@ -19,7 +19,8 @@ mixin InitializationProcessor {
     final env = factory.getEnvironmentStore();
     final trackingManager = factory.createTrackingManager(env);
     await trackingManager.enableReporting(
-      shouldSend: !kDebugMode && env.isProduction,
+      shouldSend: false,
+      // shouldSend: !kDebugMode && env.isProduction,
     );
     try {
       await for (final step in Stream.fromIterable(steps.entries)) {
