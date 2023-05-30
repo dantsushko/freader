@@ -32,6 +32,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             sections: [
               SettingsSection(
+                margin: const EdgeInsetsDirectional.all(4),
                 tiles: [
                   SettingsTile.navigation(
                     onPressed: (ctx) => GoRouter.of(context).push('/settings/iap'),
@@ -44,8 +45,17 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               SettingsSection(
+                margin: const EdgeInsetsDirectional.all(4),
                 title: const Text('Службы'),
                 tiles: [
+                  SettingsTile.navigation(
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                    ),
+                    onPressed: (ctx) => GoRouter.of(context).push('/settings/storages'),
+                    title: const Text('Хранилища файлов'),
+                  ),
                   SettingsTile.navigation(
                     trailing: const Icon(
                       Icons.arrow_forward_ios,
@@ -76,6 +86,7 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               SettingsSection(
+                margin: const EdgeInsetsDirectional.all(4),
                 title: const Text('Настройки'),
                 tiles: [
                   SettingsTile.navigation(
@@ -105,6 +116,7 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               SettingsSection(
+                margin: const EdgeInsetsDirectional.all(4),
                 tiles: [
                   SettingsTile.navigation(
                     trailing: const Icon(

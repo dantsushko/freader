@@ -35,6 +35,7 @@ class FB2Book {
   late final List<FB2Element> elements;
 }
 
+
 Future<FB2Book> parseFB2(Uint8List bytes) async {
   final res = utf8.decode(bytes);
   final root = XmlDocument.parse(res).getElement('FictionBook')!;

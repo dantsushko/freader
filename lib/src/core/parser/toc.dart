@@ -19,7 +19,6 @@ class TableOfContents {
     final titles = book.elements.whereType<FB2Title>();
     for (final title in titles) {
       toc.addChapter(Chapter.fromFB2Title(title));
-      ;
     }
 
     return toc;

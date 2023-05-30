@@ -14,6 +14,8 @@ import 'package:freader/src/feature/settings/widget/settings_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../feature/settings/storages/storages_screen.dart';
+
 extension Extra on Object {
   Map<String, dynamic> toMap() {
     if (this is Map<String, dynamic>) {
@@ -123,6 +125,11 @@ void initRouter({required SharedPreferences prefs}) {
               child: const SettingsScreen(),
             ),
             routes: [
+              GoRoute(
+                name: 'storages',
+                path: 'storages',
+                builder: (context, state) => const StoragesScreen(),
+              ),
               GoRoute(
                 name: 'iap',
                 path: 'iap',

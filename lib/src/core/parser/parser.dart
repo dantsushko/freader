@@ -78,7 +78,7 @@ class Parser {
         } on FormatException {
           l.i('archive not ready');
           if (attempts <= 5) {
-            await Future.delayed(const Duration(seconds: 1));
+            await Future<void>.delayed(const Duration(seconds: 1));
             return parse(filePath);
           }
           attempts = 0;

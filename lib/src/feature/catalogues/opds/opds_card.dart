@@ -38,52 +38,58 @@ class OpdsCard extends StatelessWidget {
   Widget _buildThumbnail() {
     final imageLink = entry.links.whereType<OpdsLinkImage>().firstOrNull;
     if (imageLink != null) {
-      return Padding(
-        padding: const EdgeInsets.all(4),
-        child: Image.network(
-          imageLink.uri.toString(),
-          width: 120,
-          height: 100,
-          errorBuilder: (ctx, _, __) => const SizedBox.shrink(),
-        ),
+      return Image.network(
+        
+        imageLink.uri.toString(),
+        height: 110,
+        width: 50,
+        fit: BoxFit.contain,
+        errorBuilder: (ctx, _, __) => const SizedBox.shrink(),
       );
     } else {
-      return const SizedBox(
-        width: 120,
-      );
+      return const SizedBox.shrink();
     }
   }
 
   @override
   Widget build(BuildContext context) => InkWell(
         onTap: () => _handleCardTap(context),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: SizedBox(
+          height:entry.categories.isNotEmpty ?110 : 50,
+          child: Card(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.title,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                      if (entry.authors.firstOrNull?.name != null)
-                        Text(entry.authors.firstOrNull!.name!)
-                      else if (entry.content != null)
-                        Text(entry.content!),
-                      if (entry.categories.isNotEmpty)
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Column(
+                      
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          entry.categories.map((e) => e.term).join(', '),
-                          style: const TextStyle(overflow: TextOverflow.ellipsis),
-                          maxLines: 3,
+                          entry.title,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                         ),
-                      if (entry.format != null) Text(entry.format!),
-                    ],
+                        if (entry.authors.firstOrNull?.name != null)
+                          Text(entry.authors.firstOrNull!.name!,  style: const TextStyle(fontSize: 12),
+                          )
+                        else if (entry.content != null)
+                          Text(entry.content!,  style: const TextStyle(fontSize: 12),),
+                        if (entry.categories.isNotEmpty)
+                          Expanded(
+                            child: Text(
+                              entry.categories.map((e) => e.term).join(', '),
+                              style: const TextStyle(overflow: TextOverflow.ellipsis, fontSize: 12),
+                              maxLines: 2,
+                            ),
+                          ),
+                        if (entry.format != null) Text(entry.format!,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 _buildThumbnail(),
