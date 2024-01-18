@@ -127,7 +127,10 @@ class BookColumn extends StatelessWidget {
           Image.memory(
             bookWithMetadata.book.cover!,
             fit: BoxFit.contain,
-            errorBuilder: (ctx, _, __) => const SizedBox.shrink(),
+            errorBuilder: (ctx, _, __) => Image.asset(
+              'assets/images/book-cover-placeholder.png',
+              fit: BoxFit.contain,
+            )
           ),
           ElevatedButton(
             onPressed: () {

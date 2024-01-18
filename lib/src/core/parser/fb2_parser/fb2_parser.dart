@@ -50,8 +50,8 @@ Future<FB2Book> parseFB2(Uint8List bytes) async {
       root.findAllElements('section').where((element) => element.getAttribute('id') != null);
   for (final note in allNotes) {
     final noteValue = allNoteValues
-        .firstWhere((element) => element.getAttribute('id') == note.name.replaceAll('#', ''));
-    note.value = noteValue.getElement('p')?.innerText ?? '';
+        .firstWhereOrNull((element) => element.getAttribute('id') == note.name.replaceAll('#', ''));
+    note.value = noteValue?.getElement('p')?.innerText ?? '';
   }
 
   final wordCount =

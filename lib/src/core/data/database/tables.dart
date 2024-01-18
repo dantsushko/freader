@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:freader/src/feature/book/book_card/card.dart';
 
 enum ThemeName { day, sepia, night, dusk, dawn, pastel, sand, tango }
 
@@ -7,9 +8,9 @@ enum PageScrollStyle {
   flip('Перелистывание'),
   shift('Сдвиг'),
   noAnimation('Без анимации');
+
   const PageScrollStyle(this.label);
   final String label;
-
 }
 
 mixin AutoIncrementingPrimaryKey on Table {
@@ -51,6 +52,9 @@ class BookEntries extends Table {
   RealColumn get timestamp => real()();
   TextColumn get directory => text().nullable()();
   BlobColumn get cover => blob().nullable()();
+  IntColumn get coverDominantColor1 => integer()();
+  IntColumn get coverDominantColor2 => integer()();
+  IntColumn get coverFontColor => integer()();
 }
 
 @DataClassName('FileEntry')
@@ -85,4 +89,5 @@ class SettingsEntries extends Table with AutoIncrementingPrimaryKey {
   IntColumn get pageTopPadding => integer()();
   IntColumn get pageBottomPadding => integer()();
   IntColumn get letterSpacing => integer()();
+  IntColumn get bookCardType => intEnum<BookCardType>()();
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/data/database/tables.dart';
 import 'package:freader/src/core/theme/color_schemes.dart';
+import 'package:freader/src/feature/book/book_card/card.dart';
 
 part 'settings_dao.g.dart';
 
@@ -15,6 +16,8 @@ class SettingsModel {
     pageTopPadding = settingsEntry.pageTopPadding;
     pageBottomPadding = settingsEntry.pageBottomPadding;
     letterSpacing = settingsEntry.letterSpacing;
+    bookCardType = settingsEntry.bookCardType;
+
   }
   late final ThemeData materialTheme;
   late final PageScrollStyle pageScrollStyle;
@@ -23,6 +26,7 @@ class SettingsModel {
   late final int pageTopPadding;
   late final int pageBottomPadding;
   late final int letterSpacing;
+  late final BookCardType bookCardType;
 }
 
 @DriftAccessor(tables: [SettingsEntries])
@@ -74,6 +78,7 @@ class SettingsDao extends DatabaseAccessor<AppDatabase> with _$SettingsDaoMixin 
     int? pageTopPadding,
     int? pageBottomPadding,
     int? letterSpacing,
+    BookCardType? bookCardType,
   }) async {
     final comp = const SettingsEntriesCompanion().copyWith(
       tid: themeId != null ? Value(themeId) : null,
@@ -82,6 +87,7 @@ class SettingsDao extends DatabaseAccessor<AppDatabase> with _$SettingsDaoMixin 
       pageHorizontalPadding: pageHorizontalPadding != null ? Value(pageHorizontalPadding) : null,
       pageTopPadding: pageTopPadding != null ? Value(pageTopPadding) : null,
       pageBottomPadding: pageBottomPadding != null ? Value(pageBottomPadding) : null,
+      bookCardType: bookCardType != null ? Value(bookCardType) : null,
       letterSpacing: letterSpacing != null ? Value(letterSpacing) : null,
     );
     await (update(settingsEntries)..where((tbl) => tbl.id.equals(1))).write(comp);

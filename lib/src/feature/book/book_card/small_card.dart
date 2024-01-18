@@ -33,24 +33,22 @@ class SmallCard extends StatelessWidget {
                 if (entity.book.cover == null)
                   const Icon(Icons.book)
                 else
-                  Padding(
-                    padding: const EdgeInsets.all(2),
-                    child: Image.memory(
-                      entity.book.cover!,
+                  Image.memory(
+                    entity.book.cover!,
+                    cacheWidth: 50,
+                    cacheHeight: 75,
+                    errorBuilder: (ctx, _, __) => Image.asset(
+                      'assets/images/book-cover-placeholder.png',
                       cacheWidth: 50,
                       cacheHeight: 75,
-                      errorBuilder: (ctx, _, __) => Image.asset(
-                        'assets/images/book-cover-placeholder.png',
-                        cacheWidth: 50,
-                        cacheHeight: 75,
-                      ),
                     ),
                   ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:collection/collection.dart';
-import 'package:epubx/epubx.dart';
+// import 'package:epubx/epubx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freader/src/core/parser/toc.dart';
 import 'package:freader/src/core/utils/path.dart';
@@ -24,16 +24,16 @@ class CommonBook {
         toc = TableOfContents.fromFB2(fb2Book),
         cover = fb2Book.cover.bytes,
         filePath = path;
-  CommonBook.fromEpub(this.epubBook, this.downloadUrl, this.path)
-      : title = epubBook!.Title ?? '',
-        language = epubBook.Schema?.Package?.Metadata?.Languages?.firstOrNull ?? '',
-        published = epubBook.Schema?.Package?.Metadata?.Dates?.firstOrNull?.Date ?? '',
-        directory = getDirName(path),
-        fileName = getFileName(path),
-        format = 'epub',
-        filePath = path,
-        annotation = epubBook.Schema?.Package?.Metadata?.Description ?? 'No annotation',
-        cover = epubBook.CoverImage?.getBytes() ?? Uint8List(0);
+  // CommonBook.fromEpub(this.epubBook, this.downloadUrl, this.path)
+  //     : title = epubBook!.Title ?? '',
+  //       language = epubBook.Schema?.Package?.Metadata?.Languages?.firstOrNull ?? '',
+  //       published = epubBook.Schema?.Package?.Metadata?.Dates?.firstOrNull?.Date ?? '',
+  //       directory = getDirName(path),
+  //       fileName = getFileName(path),
+  //       format = 'epub',
+  //       filePath = path,
+  //       annotation = epubBook.Schema?.Package?.Metadata?.Description ?? 'No annotation',
+  //       cover = epubBook.CoverImage?.getBytes() ?? Uint8List(0);
   String title;
   String path;
   String? downloadUrl;
@@ -46,7 +46,7 @@ class CommonBook {
   Uint8List cover;
   String annotation;
   FB2Book? fb2book;
-  EpubBook? epubBook;
+  // EpubBook? epubBook;
   int wordCount = 0;
   TableOfContents? toc;
 }
@@ -58,16 +58,16 @@ class Parser {
   int attempts = 0;
   Future<CommonBook?> parse(String filePath) async {
     final format = getBookFormat(filePath);
-    if (format == BookFormat.epub) {
-      try {
-        final bytes = File(filePath).readAsBytesSync();
-        final epubBook = await compute(EpubReader.readBook, bytes);
-        return CommonBook.fromEpub(epubBook, downloadUrl, filePath);
-      } catch (e) {
-        l.e(e);
-        return null;
-      }
-    }
+    // if (format == BookFormat.epub) {
+    //   try {
+    //     final bytes = File(filePath).readAsBytesSync();
+    //     final epubBook = await compute(EpubReader.readBook, bytes);
+    //     return CommonBook.fromEpub(epubBook, downloadUrl, filePath);
+    //   } catch (e) {
+    //     l.e(e);
+    //     return null;
+    //   }
+    // }
     if (format == BookFormat.fb2) {
       var bytes = File(filePath).readAsBytesSync();
       if (filePath.contains('zip')) {

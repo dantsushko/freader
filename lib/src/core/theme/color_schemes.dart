@@ -18,6 +18,7 @@ class NoAnimationPageTransitionsBuilder extends PageTransitionsBuilder {
   }
 }
 ThemeData themeFromDB(ThemeEntry theme) => ThemeData(
+  useMaterial3: false,
       textTheme: ThemeData.light().textTheme.copyWith(
             bodyLarge: TextStyle(color: Color(theme.textColor)),
             bodyMedium: TextStyle(color: Color(theme.textColor)),

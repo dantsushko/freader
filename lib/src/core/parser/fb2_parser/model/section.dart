@@ -1,20 +1,20 @@
 import 'package:collection/collection.dart';
 import 'package:freader/src/core/parser/fb2_parser/model/image.dart';
 import 'package:freader/src/core/parser/fb2_parser/model/title_info.dart';
-import 'package:hyphenatorx/hyphenatorx.dart';
-import 'package:hyphenatorx/languages/language_ru.dart';
+// import 'package:hyphenatorx/hyphenatorx.dart';
+// import 'package:hyphenatorx/languages/language_ru.dart';
 import 'package:xml/xml.dart';
 
 import 'element.dart';
 import 'link.dart';
 import 'title.dart';
 
-final hyphenator = Hyphenator(Language_ru(), minWordLength: 4, symbol: '-');
+// final hyphenator = Hyphenator(Language_ru(), minWordLength: 4, symbol: '-');
 
 class FB2Text extends FB2Element {
-  FB2Text(String text, {this.emphasis = false}) {
+  FB2Text(this.text, {this.emphasis = false}) {
     // this.text = hyphenator.hyphenateText(text);
-    this.text = text.split('').join('\u{00AD}');
+    // this.text = text.split('').join('\u{00AD}');
   }
   late final String text;
   final bool emphasis;

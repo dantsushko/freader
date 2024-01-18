@@ -69,15 +69,11 @@ class _FB2ScreenState extends State<FB2Screen> {
         return ScrollablePositionedList.builder(
             itemCount: book.elements.length,
             itemScrollController: _scrollController,
-            itemBuilder: (context, index) => _buildFB2ElementWidget(book.elements[index])
-            // children: [
-            //   Image.memory(book.cover.bytes),
-            //   Text(book.body.epigraph ?? '', style: TextStyle(fontSize: fontSize)),
-            //   ....map((e) => _buildFB2ElementWidget(e.content)),
-            // ],
+            itemBuilder: (context, index) => _buildFB2ElementWidget(book.elements[index]),
             );
 
       case PageScrollStyle.shift:
+        
         return PageView.builder(
           itemCount: bookPages.length,
           itemBuilder: (context, index) => Text(bookPages[index].toString()),
@@ -90,7 +86,7 @@ class _FB2ScreenState extends State<FB2Screen> {
   @override
   Widget build(BuildContext context) => BlocListener<ReaderNavigatorBloc, ReaderNavigatorState>(
         listener: (context, state) {
-          _scrollController.jumpTo(index: state.chapterIndex, alignment: 0);
+          _scrollController.jumpTo(index: state.chapterIndex);
         },
         child: SelectionArea(
           child: Padding(
@@ -100,7 +96,7 @@ class _FB2ScreenState extends State<FB2Screen> {
                 top: pageTopPadding,
                 bottom: pageBottomPadding,
               ),
-              child: getScrollingWidget()),
+              child: getScrollingWidget(),),
         ),
       );
 
@@ -125,6 +121,7 @@ class _FB2ScreenState extends State<FB2Screen> {
       final spans = <InlineSpan>[];
       for (final e in element.elements) {
         if (e is FB2Text) {
+          
           spans.add(TextSpan(text:e.text,
               style: TextStyle(
                   wordSpacing: 4,

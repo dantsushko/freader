@@ -50,6 +50,7 @@ class AppContext extends StatelessWidget {
                 darkTheme: material,
                 themeMode: ThemeMode.system,
               ),
+              
               routerConfig: goRouter,
               debugShowCheckedModeBanner: false,
               supportedLocales: AppLocalization.supportedLocales,

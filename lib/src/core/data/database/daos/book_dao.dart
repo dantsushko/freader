@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/data/database/tables.dart';
 import 'package:freader/src/core/parser/parser.dart';
+import 'package:freader/src/core/utils/dominant_color.dart';
 
 part 'book_dao.g.dart';
 
@@ -21,6 +22,7 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
   BookDao(super.db);
 
   Future<void> importBook(CommonBook book) async {
+    final dominantColors = DominantColor.get(book.cover);
     final newBook = BookEntriesCompanion.insert(
       timestamp: 0,
       filename: book.fileName,
@@ -29,6 +31,9 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
       filesize: File(book.filePath).lengthSync(),
       directory: Value(book.directory),
       format: book.format,
+      coverDominantColor1: dominantColors.first.value,
+      coverDominantColor2: dominantColors.last.value,
+      coverFontColor: DominantColor.getReverseWhiteOrBlack(dominantColors.first).value,
     );
 
     final bid = await into(bookEntries).insert(newBook);
@@ -75,6 +80,12 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
               ? null
               : BookWithMetadata(book.readTable(bookEntries), book.readTable(metadataEntries)),
         );
+  }
+
+  Future<bool> bookExists(String filePath) async {
+    final query = select(bookEntries)..where((tbl) => tbl.filepath.equals(filePath));
+    final book = await query.get();
+    return book.isNotEmpty;
   }
 
   Stream<List<BookWithMetadata>> watchAll({String? directory, bool lastRead = false}) {

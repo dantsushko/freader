@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:freader/src/core/data/database/daos/settings_dao.dart';
+import 'package:freader/src/feature/book/book_card/card.dart';
 import 'connection/connection.dart' as impl;
 import 'daos/book_dao.dart';
 import 'daos/metadata_dao.dart';
@@ -27,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
   Future<void> deleteEverything() => transaction(() async {
         for (final table in allTables) {
           await delete(table).go();
@@ -35,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
       });
 
   Future<void> init() async{
-     
+
 
   }
   @override
@@ -94,7 +95,8 @@ class AppDatabase extends _$AppDatabase {
                   pageBottomPadding: 0,
                   pageTopPadding: 0,
                   pageHorizontalPadding: 2,
-                  letterSpacing: -2
+                  letterSpacing: -2,
+                  bookCardType: BookCardType.small
                 ),);
             });
           }

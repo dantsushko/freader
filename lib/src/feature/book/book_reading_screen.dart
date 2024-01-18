@@ -102,9 +102,9 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                               if (book.fb2book != null) {
                                 return FB2Screen(book: book.fb2book!);
                               }
-                              if (book.epubBook != null) {
-                                return EpubScreen(book: book.epubBook!);
-                              }
+                              // if (book.epubBook != null) {
+                                // return EpubScreen(book: book.epubBook!);
+                              // }
 
                               return const Center(child: CircularProgressIndicator());
                             },

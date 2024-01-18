@@ -1,16 +1,16 @@
 import 'dart:io';
 
 // import 'package:epub_view/epub_view.dart';
-import 'package:epubx/epubx.dart';
+// import 'package:epubx/epubx.dart';
 import 'package:flutter/material.dart';
 
 class EpubScreen extends StatelessWidget {
   const EpubScreen({
     super.key,
-    required this.book,
+    // required this.book,
   });
 
-  final EpubBook book;
+  // final EpubBook book;
 
   @override
   Widget build(BuildContext context) {
