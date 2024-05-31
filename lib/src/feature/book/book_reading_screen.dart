@@ -7,6 +7,7 @@ import 'package:freader/src/core/parser/parser.dart';
 import 'package:freader/src/feature/book/epub/epub_screen.dart';
 import 'package:freader/src/feature/catalogues/opds/util.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:go_router/go_router.dart';
 
 import 'blocs/navigator/bloc/reader_navigator_bloc.dart';
 import 'fb2/fb2_screen.dart';
@@ -44,9 +45,9 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
 
   void initAppBar() {
     if (showControls.value) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
     } else {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack, overlays: SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack, overlays: SystemUiOverlay.values);
     }
   }
 
@@ -80,7 +81,7 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
             stopwatch.start();
           },
           child: ColoredBox(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             child: SafeArea(
               bottom: false,
               left: false,
@@ -89,31 +90,45 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                 body: Builder(
                   builder: (context) {
                     if (snapshot.hasError) {
-                      throw(Exception(snapshot.stackTrace));
+                      return Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(snapshot.error.toString()),
+                          ElevatedButton(
+                            onPressed: () => GoRouter.of(context).go('/'),
+                            child: const Text('Home'),
+                          ),
+                        ],
+                      ));
                     }
                     if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                     final book = snapshot.data!;
                     return BlocProvider(
                       create: (context) => ReaderNavigatorBloc(),
-                      child: Stack(
-                        children: [
-                          Builder(
-                            builder: (context) {
-                              if (book.fb2book != null) {
-                                return FB2Screen(book: book.fb2book!);
-                              }
-                              // if (book.epubBook != null) {
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        child: Stack(
+                          children: [
+                            Builder(
+                              builder: (context) {
+                                if (book.fb2book != null) {
+                                  print(widget.bookId);
+                                  return FB2Screen(book: book.fb2book!, bid: widget.bookId);
+                                }
+                                // if (book.epubBook != null) {
                                 // return EpubScreen(book: book.epubBook!);
-                              // }
+                                // }
 
-                              return const Center(child: CircularProgressIndicator());
-                            },
-                          ),
-                          FloatingAppBar(
-                              showControls: showControls,
-                              title: snapshot.data?.title ?? '',
-                              book: snapshot.data),
-                        ],
+                                return const Center(child: CircularProgressIndicator());
+                              },
+                            ),
+                            FloatingAppBar(
+                                showControls: showControls,
+                                title: snapshot.data?.title ?? '',
+                                book: snapshot.data),
+                          ],
+                        ),
                       ),
                     );
                   },

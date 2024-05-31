@@ -4,7 +4,7 @@ final List<FReaderStorage> storages = [
   LocalStorage(),
 ];
 
-interface class FReaderStorage {
+abstract class FReaderStorage {
   String get  name => throw UnimplementedError();
    String get route => throw UnimplementedError();
   void connect() {

@@ -22,7 +22,7 @@ class FB2Image extends FB2Element{
 
   /// image name
   late final String name;
-
+  double height = 0;
   @override
   String toString() => 'FB2Image(name: $name)';
 }

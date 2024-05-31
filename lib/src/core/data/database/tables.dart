@@ -91,3 +91,16 @@ class SettingsEntries extends Table with AutoIncrementingPrimaryKey {
   IntColumn get letterSpacing => integer()();
   IntColumn get bookCardType => intEnum<BookCardType>()();
 }
+
+
+
+@DataClassName('Cursor')
+class CursorEntries extends Table {
+  IntColumn get bid => integer().references(BookEntries, #bid, onDelete: KeyAction.cascade)();
+  IntColumn get page => integer()();
+  RealColumn get offset => real()();
+
+}
+
+
+

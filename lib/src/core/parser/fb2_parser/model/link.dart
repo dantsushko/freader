@@ -6,7 +6,7 @@ enum LinkType { note, link }
 
 class FB2Link extends FB2Element {
   FB2Link(XmlElement link, String type) {
-    name = link.getAttribute('href', namespace: '*')!;
+    name = link.getAttribute('href', namespace: '*') ?? 'null';
     text = link.innerText;
     this.type = type == 'note' ? LinkType.note : LinkType.link;
   }

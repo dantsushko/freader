@@ -55,7 +55,7 @@ class OpdsCard extends StatelessWidget {
   Widget build(BuildContext context) => InkWell(
         onTap: () => _handleCardTap(context),
         child: SizedBox(
-          height:entry.categories.isNotEmpty ?110 : 50,
+          height:entry.categories.isNotEmpty ?110 : 70,
           child: Card(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -76,7 +76,7 @@ class OpdsCard extends StatelessWidget {
                           Text(entry.authors.firstOrNull!.name!,  style: const TextStyle(fontSize: 12),
                           )
                         else if (entry.content != null)
-                          Text(entry.content!,  style: const TextStyle(fontSize: 12),),
+                          Text(entry.content!,  overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12),),
                         if (entry.categories.isNotEmpty)
                           Expanded(
                             child: Text(

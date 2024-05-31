@@ -25,7 +25,11 @@ class _DirectoryContentScreenState extends State<DirectoryContentScreen> {
   late final List<FileSystemEntity> entities;
   @override
   void initState() {
-    entities = Directory(widget.directoryPath).listSync().whereType<Directory>().toList();
+    final dir = Directory(widget.directoryPath);
+    if (!dir.existsSync()) {
+      dir.createSync(recursive: true);
+    }
+    entities = dir.listSync().whereType<Directory>().toList();
     super.initState();
   }
 

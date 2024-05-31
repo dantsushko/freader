@@ -3,6 +3,7 @@ import 'package:freader/src/core/data/database/daos/settings_dao.dart';
 import 'package:freader/src/feature/book/book_card/card.dart';
 import 'connection/connection.dart' as impl;
 import 'daos/book_dao.dart';
+import 'daos/cursor_dao.dart';
 import 'daos/metadata_dao.dart';
 import 'daos/opds_dao.dart';
 import 'tables.dart';
@@ -15,12 +16,14 @@ part 'database.g.dart';
   MetadataEntries,
   FileEntries,
   ThemeEntries,
-  SettingsEntries
+  SettingsEntries,
+  CursorEntries,
 ], daos: [
   OpdsDao,
   BookDao,
   MetadataDao,
   SettingsDao,
+  CursorDao,
 ],)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(impl.connect());
@@ -95,7 +98,7 @@ class AppDatabase extends _$AppDatabase {
                   pageBottomPadding: 0,
                   pageTopPadding: 0,
                   pageHorizontalPadding: 2,
-                  letterSpacing: -2,
+                  letterSpacing: 0,
                   bookCardType: BookCardType.small
                 ),);
             });

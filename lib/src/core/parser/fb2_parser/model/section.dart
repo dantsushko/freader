@@ -12,18 +12,19 @@ import 'title.dart';
 // final hyphenator = Hyphenator(Language_ru(), minWordLength: 4, symbol: '-');
 
 class FB2Text extends FB2Element {
-  FB2Text(this.text, {this.emphasis = false}) {
+  FB2Text(String text, {this.emphasis = false}) {
+    // this.text = text;
     // this.text = hyphenator.hyphenateText(text);
-    // this.text = text.split('').join('\u{00AD}');
+    this.text = text.split('').join('\u{00AD}');
   }
   late final String text;
   final bool emphasis;
 }
 
 class FB2Paragraph extends FB2Element {
-  List<FB2Element> _elements = [];
+  final List<FB2Element> _elements = [];
   List<FB2Element> get elements => _elements;
-
+  String get text => _elements.map((e) => e.text).join(' ');
   void add(FB2Element element) {
     _elements.add(element);
   }

@@ -69,6 +69,8 @@ class Parser {
     //   }
     // }
     if (format == BookFormat.fb2) {
+      final file = File(filePath);
+      if(!file.existsSync()) throw Exception('File not found');
       var bytes = File(filePath).readAsBytesSync();
       if (filePath.contains('zip')) {
         try {

@@ -64,7 +64,7 @@ void initRouter({required SharedPreferences prefs}) {
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => BaseScreen(
-          child: child,
+          child: SafeArea(child: child),
         ),
         routes: [
           GoRoute(

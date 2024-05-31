@@ -25,7 +25,7 @@ class FloatingAppBar extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: 30,
+            height: 40,
             child: AppBar(
               title: Text(
                 title,
@@ -46,8 +46,11 @@ class FloatingAppBar extends StatelessWidget {
                       child: const BookSettingsScren(),
                     ),
                   ),
-                  child: const Icon(
-                    Icons.settings,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: const Icon(
+                      Icons.settings,
+                    ),
                   ),
                 ),
                 InkWell(
@@ -66,8 +69,12 @@ class FloatingAppBar extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Icon(
-                    Icons.menu_book_sharp,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 2.0, right: 8, left: 8),
+                    child: const Icon(
+                      Icons.menu_book,
+                      size: 25
+                    ),
                   ),
                 ),
               ],

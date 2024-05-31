@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:auto_hyphenating_text/auto_hyphenating_text.dart';
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/file/watcher.dart';
 import 'package:freader/src/core/router/go_router.dart';
@@ -19,10 +17,10 @@ mixin InitializationSteps {
     ..._dependencies,
     ..._data,
   };
+
   static final _dependencies = <String, StepAction>{
     'Init Shared Preferences': (progress) async {
       final sharedPreferences = await SharedPreferences.getInstance();
-        await initHyphenation(DefaultResourceLoaderLanguage.ru);
       initRouter(prefs: sharedPreferences);
       return progress.copyWith(
         preferences: sharedPreferences,
