@@ -174,12 +174,18 @@ class OpdsColumn extends StatelessWidget {
               child: Image.network(
                 opdsEntry!.images.first.uri.toString(),
                 fit: BoxFit.contain,
-                errorBuilder: (ctx, _, __) => const SizedBox.shrink(),
+                errorBuilder: (ctx, _, __) => Image.asset(
+                  'assets/images/book-cover-placeholder.png',
+                  fit: BoxFit.contain,
+                ),
               ),
             )
           else
-            const SizedBox.shrink(),
-          if (status?.status != DownloadState.downloading)
+            Image.asset(
+              'assets/images/book-cover-placeholder.png',
+              fit: BoxFit.contain,
+            ),
+          if (status?.status == DownloadState.none || status?.status == null || status?.status == DownloadState.cancelled)
             ElevatedButton(
               onPressed: opdsEntry!.download != null
                   ? () async {
@@ -187,8 +193,8 @@ class OpdsColumn extends StatelessWidget {
                     }
                   : null,
               child: const Text('Скачать'),
-            )
-          else
+            ),
+          if (status?.status == DownloadState.downloading)
             ElevatedButton(
               onPressed: downloader.cancelDownload,
               child: Text('Загружается: ${(status!.percentage * 100).toStringAsFixed(2)}%'),

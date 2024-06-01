@@ -113,7 +113,6 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                             Builder(
                               builder: (context) {
                                 if (book.fb2book != null) {
-                                  print(widget.bookId);
                                   return FB2Screen(book: book.fb2book!, bid: widget.bookId);
                                 }
                                 // if (book.epubBook != null) {

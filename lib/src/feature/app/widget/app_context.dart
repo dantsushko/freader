@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:freader/src/core/localization/app_localization.dart';
 import 'package:freader/src/core/router/go_router.dart';
@@ -53,8 +54,15 @@ class AppContext extends StatelessWidget {
               
               routerConfig: goRouter,
               debugShowCheckedModeBanner: false,
-              supportedLocales: AppLocalization.supportedLocales,
-              localizationsDelegates: AppLocalization.localizationsDelegates,
+                supportedLocales: [
+                Locale('en'), // English
+                Locale('es'), // Spanish
+              ],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
               locale: const Locale('ru'),
             ),
           );

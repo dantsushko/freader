@@ -173,6 +173,12 @@ class _BookSettingsScrenState extends State<BookSettingsScren> {
                       )
                       .toList(),
                 ),
+                SettingsSection(
+                  title: const Text('ПЕРЕНОС'),
+                  tiles: [
+                    SettingsTile.switchTile(initialValue: settings.softHyphen == true, onToggle: (toggled)=> _settingsDao.updateSetting(softHyphen: toggled), title: Text('Мягкие переносы'))
+                  ],
+                ),
               ],
             );
           },

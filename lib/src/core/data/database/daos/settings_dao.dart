@@ -16,6 +16,7 @@ class SettingsModel {
     pageTopPadding = settingsEntry.pageTopPadding;
     pageBottomPadding = settingsEntry.pageBottomPadding;
     letterSpacing = settingsEntry.letterSpacing;
+    softHyphen = settingsEntry.softHyphen;
     bookCardType = settingsEntry.bookCardType;
 
   }
@@ -27,6 +28,7 @@ class SettingsModel {
   late final int pageBottomPadding;
   late final int letterSpacing;
   late final BookCardType bookCardType;
+  late final bool softHyphen;
 }
 
 @DriftAccessor(tables: [SettingsEntries])
@@ -79,12 +81,14 @@ class SettingsDao extends DatabaseAccessor<AppDatabase> with _$SettingsDaoMixin 
     int? pageBottomPadding,
     int? letterSpacing,
     BookCardType? bookCardType,
+    bool? softHyphen,
   }) async {
     final comp = const SettingsEntriesCompanion().copyWith(
       tid: themeId != null ? Value(themeId) : null,
       pageScrollStyle: pageScrollStyle != null ? Value(pageScrollStyle) : null,
       fontSize: fontSize != null ? Value(fontSize) : null,
       pageHorizontalPadding: pageHorizontalPadding != null ? Value(pageHorizontalPadding) : null,
+      softHyphen: softHyphen != null ? Value(softHyphen) : null,
       pageTopPadding: pageTopPadding != null ? Value(pageTopPadding) : null,
       pageBottomPadding: pageBottomPadding != null ? Value(pageBottomPadding) : null,
       bookCardType: bookCardType != null ? Value(bookCardType) : null,

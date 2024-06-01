@@ -31,7 +31,7 @@ class FB2Screen extends StatefulWidget {
 }
 
 class _FB2ScreenState extends State<FB2Screen> {
-  final ItemScrollController _scrollController = ItemScrollController();
+   final ItemScrollController _scrollController = ItemScrollController();
   late final FB2Book book;
   late final PageController _pageController;
   late SettingsModel settings;
@@ -45,11 +45,19 @@ class _FB2ScreenState extends State<FB2Screen> {
   double get letterSpacing => settings.letterSpacing.toDouble();
   PageScrollStyle get pageScrollStyle => settings.pageScrollStyle;
   late final StreamSubscription<SettingsModel> subscription;
-
+  final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
   @override
   void initState() {
     settings = DependenciesScope.dependenciesOf(context).database.settingsDao.initialSettings;
-
+    itemPositionsListener.itemPositions
+        .addListener(() async {
+          print(itemPositionsListener.itemPositions.value);
+          await DependenciesScope.of(context)
+        .dependencies
+        .database
+        .cursorDao
+        .updateCursor(bid: widget.bid, offset: itemPositionsListener.itemPositions.value.first.index.toDouble());
+        });
     subscription = DependenciesScope.dependenciesOf(context)
         .database
         .settingsDao
@@ -64,7 +72,6 @@ class _FB2ScreenState extends State<FB2Screen> {
     cursor =
         await DependenciesScope.of(context).dependencies.database.cursorDao.getCursor(widget.bid);
 
-    print('Cursor: $cursor');
     _pageController = PageController(initialPage: cursor?.page ?? 0);
   }
 
@@ -83,9 +90,10 @@ class _FB2ScreenState extends State<FB2Screen> {
     switch (pageScrollStyle) {
       case PageScrollStyle.scroll:
         return ScrollablePositionedList.builder(
-          itemPositionsListener: ItemPositionsListener.create(),
+          itemPositionsListener: itemPositionsListener,
           itemCount: book.elements.length,
           itemScrollController: _scrollController,
+          initialScrollIndex: cursor?.offset.toInt() ?? 0,
           itemBuilder: (context, index) => _buildFB2ElementWidget(book.elements[index]),
         );
 
@@ -171,7 +179,7 @@ class _FB2ScreenState extends State<FB2Screen> {
         if (e is FB2Text) {
           spans.add(
             TextSpan(
-              text: e.text,
+              text: settings.softHyphen ? split(e.text) : e.text,
               style: TextStyle(
                 wordSpacing: 4,
                 letterSpacing: letterSpacing,
@@ -204,9 +212,13 @@ class _FB2ScreenState extends State<FB2Screen> {
           );
         }
       }
-      return Text.rich(
-        TextSpan(children: spans),
-        softWrap: true,
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        child: Text.rich(
+          textAlign: TextAlign.justify,
+          TextSpan(children: spans),
+          softWrap: true,
+        ),
       );
     }
     if (element is FB2Link && element.type != LinkType.note) {
@@ -256,7 +268,7 @@ class _FB2ScreenState extends State<FB2Screen> {
       return h;
     }
     if (element is FB2Paragraph) {
-      num totalHeight = 0;
+      num totalHeight = 8;
       for (final childElement in element.elements) {
         totalHeight += await getHeight(childElement, pageWidth);
       }

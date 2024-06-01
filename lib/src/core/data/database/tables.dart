@@ -90,6 +90,8 @@ class SettingsEntries extends Table with AutoIncrementingPrimaryKey {
   IntColumn get pageBottomPadding => integer()();
   IntColumn get letterSpacing => integer()();
   IntColumn get bookCardType => intEnum<BookCardType>()();
+  BoolColumn get softHyphen => boolean()();
+
 }
 
 

@@ -5,10 +5,10 @@ import 'element.dart';
 enum LinkType { note, link }
 
 class FB2Link extends FB2Element {
-  FB2Link(XmlElement link, String type) {
+  FB2Link(XmlElement link) {
     name = link.getAttribute('href', namespace: '*') ?? 'null';
     text = link.innerText;
-    this.type = type == 'note' ? LinkType.note : LinkType.link;
+    type = name.startsWith('#') ? LinkType.note : LinkType.link;
   }
   late final String name;
   late final String text;

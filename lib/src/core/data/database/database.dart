@@ -97,7 +97,8 @@ class AppDatabase extends _$AppDatabase {
                   fontSize: 20,
                   pageBottomPadding: 0,
                   pageTopPadding: 0,
-                  pageHorizontalPadding: 2,
+                  pageHorizontalPadding: 8,
+                  softHyphen: true,
                   letterSpacing: 0,
                   bookCardType: BookCardType.small
                 ),);

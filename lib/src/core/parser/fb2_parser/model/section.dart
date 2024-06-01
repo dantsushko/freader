@@ -1,22 +1,56 @@
 import 'package:collection/collection.dart';
 import 'package:freader/src/core/parser/fb2_parser/model/image.dart';
-import 'package:freader/src/core/parser/fb2_parser/model/title_info.dart';
-// import 'package:hyphenatorx/hyphenatorx.dart';
-// import 'package:hyphenatorx/languages/language_ru.dart';
 import 'package:xml/xml.dart';
 
 import 'element.dart';
 import 'link.dart';
 import 'title.dart';
 
-// final hyphenator = Hyphenator(Language_ru(), minWordLength: 4, symbol: '-');
+String split(String sentence, {String separator = '\u{00AD}'}) {
+  final words = sentence.split(' ');
+  final res = [];
+  for (final w in words) {
+    final prefixMatch = RegExp(r'^\p{P}+', unicode: true).firstMatch(w);
+    final wordMatch = RegExp(r'[^\p{P}\s]+', unicode: true).firstMatch(w);
+    final postfixMatch = RegExp(r'\p{P}+$', unicode: true).firstMatch(w);
+
+    String prefix = prefixMatch != null ? prefixMatch.group(0)! : '';
+    String word = wordMatch != null ? wordMatch.group(0)! : '';
+    String postfix = postfixMatch != null ? postfixMatch.group(0)! : '';
+
+    String splitted = splitWord(word).join(separator);
+    res.add('$prefix$splitted$postfix');
+  }
+  return res.join(' ');
+}
+
+List<String> splitWord(String word) {
+  const vowels = 'аеёиоуыэюяАЕЁИОУЫЭЮЯ';
+  const appendage = 'йьъЙЬЪ';
+  const consonants = 'бвгджзйклмнпрстфхцчшщьъБВГДЖЗЙКЛМНПРСТФХЦЧШЩЬЪ';
+  const sonorants = 'лмнрЛМНР';
+
+  final syllableRegexp = RegExp('[$consonants]*[$vowels]([$consonants]*\$)?');
+  final syllables = syllableRegexp.allMatches(word).map((match) => match.group(0)!).toList();
+  for (var i = 1; i < syllables.length; i++) {
+    final match = RegExp('^[$consonants]*[$appendage]').firstMatch(syllables[i]);
+    if (match != null && syllables[i] != 'ться') {
+      syllables[i - 1] += match.group(0)!;
+      syllables[i] = syllables[i].substring(match.group(0)!.length);
+    } else if (sonorants.contains(syllables[i][0]) && !vowels.contains(syllables[i][1])) {
+      syllables[i - 1] += syllables[i][0];
+      syllables[i] = syllables[i].substring(1);
+    }
+  }
+  if (syllables.isEmpty) {
+    return [word];
+  }
+
+  return syllables;
+}
 
 class FB2Text extends FB2Element {
-  FB2Text(String text, {this.emphasis = false}) {
-    // this.text = text;
-    // this.text = hyphenator.hyphenateText(text);
-    this.text = text.split('').join('\u{00AD}');
-  }
+  FB2Text(this.text, {this.emphasis = false});
   late final String text;
   final bool emphasis;
 }
@@ -63,7 +97,7 @@ class FB2Section {
             wordCount += child.innerText.split(' ').length;
           }
           if (child is XmlElement && child.name.local == 'a') {
-            final link = FB2Link(child, child.getAttribute('type') ?? 'as');
+            final link = FB2Link(child);
             p.add(link);
             links.add(link);
           }

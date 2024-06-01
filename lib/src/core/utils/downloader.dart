@@ -25,8 +25,6 @@ class DownloadStatus {
 class Downloader {
   Downloader(this.database);
   final AppDatabase database;
-
-  final ReceivePort _port = ReceivePort();
   final downloadController = StreamController<DownloadStatus>.broadcast();
   Stream<DownloadStatus> get downloadProgress => downloadController.stream;
   late final StreamSubscription<List<SharedFile>> _intentDataStreamSubscription;
@@ -57,50 +55,35 @@ class Downloader {
   }
 
   Future<void> startDownload(String url) async {
-    downloadController.add(DownloadStatus(0, DownloadState.queued));
+    downloadController.add(DownloadStatus(0, DownloadState.downloading));
     final uri = await getRedirectedUri(url);
-    
+
     final task = await DownloadTask(url: uri, directory: 'Books/Downloads')
         .withSuggestedFilename(unique: true);
-    await FileDownloader().download(task, onProgress: (progress) {
-      var state = DownloadState.none;
-      if (progress == 1) {
-        state = DownloadState.downloaded;
-      } else {
-        state = DownloadState.downloading;
-      }
-      downloadController.add(DownloadStatus(progress, state));
-    },);
+    currentTaskId = task.taskId;
+    await FileDownloader().download(
+      task,
+      onProgress: (progress) {
+        var state = DownloadState.none;
+        if (progress == 1) {
+          state = DownloadState.downloaded;
+        } else if (progress == -2) {
+          state = DownloadState.cancelled;
+        }
+        else{
+          state = DownloadState.downloading;
+        }
+        downloadController.add(DownloadStatus(progress, state));
+      },
+    );
 
     // }
   }
 
   Future<void> cancelDownload() async {
-    // if (currentTaskId != null) {
-    //   await FlutterDownloader.cancel(taskId: currentTaskId!);
-    // }
+    await FileDownloader().cancelTaskWithId(currentTaskId!);
     currentTaskId = null;
-
-    downloadController.add(DownloadStatus(0, DownloadState.cancelled));
   }
-
-  // Future<String?> enqueTask(String url) async => FlutterDownloader.enqueue(
-  //       url: url,
-  //       savedDir: downloadDirPath,
-  //       showNotification: false,
-  //       openFileFromNotification: false,
-  //     );
-  // @pragma('vm:entry-point')
-  // static void downloadCallback(
-  //   String id,
-  //   DownloadTaskStatus status,
-  //   int progress,
-  // ) {
-  //   IsolateNameServer.lookupPortByName(
-  //     'downloader_send_port',
-  //   )!
-  //       .send([id, status.value, progress]);
-  // }
 
   Future<void> initSharing() async {
     void moveToInbox(List<SharedFile> sharedFiles) {
