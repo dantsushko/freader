@@ -31,7 +31,7 @@ class FB2Screen extends StatefulWidget {
 }
 
 class _FB2ScreenState extends State<FB2Screen> {
-   final ItemScrollController _scrollController = ItemScrollController();
+  final ItemScrollController _scrollController = ItemScrollController();
   late final FB2Book book;
   late final PageController _pageController;
   late SettingsModel settings;
@@ -49,15 +49,12 @@ class _FB2ScreenState extends State<FB2Screen> {
   @override
   void initState() {
     settings = DependenciesScope.dependenciesOf(context).database.settingsDao.initialSettings;
-    itemPositionsListener.itemPositions
-        .addListener(() async {
-          print(itemPositionsListener.itemPositions.value);
-          await DependenciesScope.of(context)
-        .dependencies
-        .database
-        .cursorDao
-        .updateCursor(bid: widget.bid, offset: itemPositionsListener.itemPositions.value.first.index.toDouble());
-        });
+    itemPositionsListener.itemPositions.addListener(() async {
+      print(itemPositionsListener.itemPositions.value);
+      await DependenciesScope.of(context).dependencies.database.cursorDao.updateCursor(
+          bid: widget.bid,
+          offset: itemPositionsListener.itemPositions.value.first.index.toDouble());
+    });
     subscription = DependenciesScope.dependenciesOf(context)
         .database
         .settingsDao
@@ -173,10 +170,15 @@ class _FB2ScreenState extends State<FB2Screen> {
     if (element is FB2EmtpyLine) {
       return const SizedBox(height: 16);
     }
+    int i = 0;
     if (element is FB2Paragraph) {
       final spans = <InlineSpan>[];
       for (final e in element.elements) {
         if (e is FB2Text) {
+          if (i < 10) {
+            print(e.text);
+            i++;
+          }
           spans.add(
             TextSpan(
               text: settings.softHyphen ? split(e.text) : e.text,

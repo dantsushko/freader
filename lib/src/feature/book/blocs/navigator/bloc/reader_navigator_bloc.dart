@@ -18,5 +18,4 @@ class ReaderNavigatorBloc extends Bloc<ReaderNavigatorEvent, ReaderNavigatorStat
     });
    
   }
-  Map<String, GlobalKey> chapterKeys = {};
 }

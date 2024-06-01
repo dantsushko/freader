@@ -45,9 +45,9 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
 
   void initAppBar() {
     if (showControls.value) {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
     } else {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack, overlays: SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     }
   }
 
@@ -83,7 +83,6 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
           child: ColoredBox(
             color: Theme.of(context).colorScheme.surface,
             child: SafeArea(
-              bottom: false,
               left: false,
               right: false,
               child: Scaffold(
@@ -126,6 +125,7 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                                 showControls: showControls,
                                 title: snapshot.data?.title ?? '',
                                 book: snapshot.data),
+                           BottomBookBar(showControls: showControls, book: snapshot.data),
                           ],
                         ),
                       ),
@@ -137,4 +137,38 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
           ),
         ),
       );
+}
+
+class BottomBookBar extends StatelessWidget {
+  const BottomBookBar({required this.showControls, required this.book, super.key});
+  final ValueNotifier<bool> showControls;
+  final CommonBook? book;
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+        valueListenable: showControls,
+        builder: (ctx, show, child) {
+          if (!show) return const SizedBox.shrink();
+          return Positioned(
+            bottom: 0,
+            height: 50,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+            
+              color: Theme.of(context).colorScheme.surface,
+              
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    Text('Current chapter'),
+                    const Spacer(),
+                    Text('22/2352')
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
 }

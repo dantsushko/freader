@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:freader/src/core/data/database/daos/book_dao.dart';
 import 'package:freader/src/core/utils/extensions/context_extension.dart';
+import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 
 import '../book_detail/book_detail.dart';
 
@@ -18,15 +18,16 @@ class SmallCard extends StatelessWidget {
         height: 60,
         child: InkWell(
           onTap: () => showModalBottomSheet<void>(
-              context: context,
-              useRootNavigator: true,
-              isScrollControlled: true,
-              builder: (ctx) => SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.9,
-                    child: BookDetailScreen(
-                      book: entity,
-                    ),
-                  ),),
+            context: context,
+            useRootNavigator: true,
+            isScrollControlled: true,
+            builder: (ctx) => SizedBox(
+              height: MediaQuery.of(context).size.height * 0.9,
+              child: BookDetailScreen(
+                book: entity,
+              ),
+            ),
+          ),
           child: Card(
             child: Row(
               children: [
@@ -83,10 +84,87 @@ class SmallCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Icon(Icons.more_vert)
+                BookContextMenu(entity: entity)
               ],
             ),
           ),
         ),
       );
+}
+
+class BookContextMenu extends StatelessWidget {
+  const BookContextMenu({super.key, required this.entity});
+  final BookWithMetadata entity;
+
+  
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      icon: Icon(Icons.more_vert),
+      onSelected: (String value) {
+        // Handle menu item selection here
+        print('Selected: $value');
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        // PopupMenuItem<String>(
+        //   value: 'move',
+        //   child: ListTile(
+        //     leading: Icon(Icons.drive_file_move),
+        //     title: Text('Переместить'),
+        //   ),
+        // ),
+        PopupMenuItem<String>(
+          onTap: () {
+            DependenciesScope.dependenciesOf(context).database.bookDao.deleteBook(entity.book.filepath);
+          },
+          child: ListTile(
+            leading: Icon(Icons.delete),
+            title: Text('Удалить'),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'share',
+          child: ListTile(
+            leading: Icon(Icons.share),
+            title: Text('Поделиться'),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'info',
+          child: ListTile(
+            leading: Icon(Icons.info),
+            title: Text('Инфо'),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'labels',
+          child: ListTile(
+            leading: Icon(Icons.label),
+            title: Text('Метки'),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'read',
+          child: ListTile(
+            leading: Icon(Icons.visibility),
+            title: Text('Читать'),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'select_all',
+          child: ListTile(
+            leading: Icon(Icons.select_all),
+            title: Text('Выбрать всё'),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'collections',
+          child: ListTile(
+            leading: Icon(Icons.collections),
+            title: Text('Коллекции'),
+          ),
+        ),
+      ],
+    );
+  }
 }

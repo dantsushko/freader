@@ -58,12 +58,11 @@ class FileWatcher {
         }
       }
     }
-    if (event.type == ChangeType.REMOVE) {
-      if (isBook(event.path)) {
-        print('delete book');
-        await db.bookDao.deleteBook(getFileName(event.path));
-      }
-    }
+    // if (event.type == ChangeType.REMOVE) {
+    //   if (isBook(event.path)) {
+    //     await db.bookDao.deleteBook(event.path);
+    //   }
+    // }
   }
 
   final AppDatabase db;

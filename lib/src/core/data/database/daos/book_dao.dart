@@ -22,6 +22,11 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
   BookDao(super.db);
 
   Future<void> importBook(CommonBook book) async {
+    final existingBook =
+        await (select(bookEntries)..where((tbl) => tbl.filename.equals(book.fileName))).get();
+    if (existingBook.isNotEmpty) {
+      return;
+    }
     final dominantColors = DominantColor.get(book.cover);
     final newBook = BookEntriesCompanion.insert(
       timestamp: 0,
@@ -57,8 +62,9 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
     await into(metadataEntries).insert(metaData);
   }
 
-  Future<void> deleteBook(String fileName) async {
-    await (delete(bookEntries)..where((tbl) => tbl.filename.equals(fileName))).go();
+  Future<void> deleteBook(String filePath) async {
+    await (delete(bookEntries)..where((tbl) => tbl.filepath.equals(filePath))).go();
+    await File(filePath).delete();
   }
 
   Future<BookWithMetadata> getBook(int id) async {

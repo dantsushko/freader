@@ -20,8 +20,8 @@ class _CatalogueIconState extends State<CatalogueIcon> {
         child: Column(
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 70,
+              height: 70,
               decoration: BoxDecoration(
                 color: Theme.of(context).textTheme.bodyLarge!.color,
                 shape: BoxShape.circle,
@@ -56,8 +56,8 @@ class AddCatalogueIcon extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 70,
+              height: 70,
               decoration:  BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,

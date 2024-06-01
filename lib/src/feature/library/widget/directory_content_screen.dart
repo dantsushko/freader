@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 import 'package:freader/src/core/utils/path.dart';
 import 'package:freader/src/feature/book/book_card/card.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
@@ -10,7 +9,6 @@ import 'package:freader/src/feature/library/widget/book_card_type_button.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart' as path;
 
-import '../../book/book_card/small_card.dart';
 import '../../../core/data/database/daos/book_dao.dart';
 
 class DirectoryContentScreen extends StatefulWidget {

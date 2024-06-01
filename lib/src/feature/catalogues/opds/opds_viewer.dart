@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freader/src/feature/catalogues/opds/model/opds_entry.model.dart';
 import 'package:freader/src/feature/catalogues/opds/model/opds_page.model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
@@ -15,6 +16,8 @@ class OpdsViewer extends StatefulWidget {
 
 class _OpdsViewerState extends State<OpdsViewer> {
   late Uri uri;
+  final PagingController<int, OpdsEntry> _pagingController = PagingController(firstPageKey: 0);
+
   @override
   void initState() {
     uri = widget.uri;
@@ -32,7 +35,6 @@ class _OpdsViewerState extends State<OpdsViewer> {
     try {
       final content = await http.get(uri);
       final page = OpdsPage(content.body, uri);
-
       final newItems = page.entries;
       final isLastPage = page.next == null;
       if (isLastPage) {
@@ -47,21 +49,16 @@ class _OpdsViewerState extends State<OpdsViewer> {
     }
   }
 
-  final PagingController<int, OpdsEntry> _pagingController = PagingController(firstPageKey: 0);
   @override
-  Widget build(BuildContext context) => RefreshIndicator(
-    displacement: 20,
-    onRefresh: () => Future.sync( _pagingController.refresh),
+  Widget build(BuildContext context) => Expanded(
     child: PagedListView<int, OpdsEntry>(
-          pagingController: _pagingController,
-          shrinkWrap: true,
-          // separatorBuilder: (context, index) => Divider(color: Theme.of(context).dividerColor,),
-          builderDelegate: PagedChildBuilderDelegate<OpdsEntry>(
-            itemBuilder: (context, item, index) => OpdsCard(
-              entry: item,
-            ),
-          ),
+      pagingController: _pagingController,
+      shrinkWrap: true,
+      builderDelegate: PagedChildBuilderDelegate<OpdsEntry>(
+        itemBuilder: (context, item, index) => OpdsCard(
+          entry: item,
         ),
+      ),
+    ),
   );
 }
-

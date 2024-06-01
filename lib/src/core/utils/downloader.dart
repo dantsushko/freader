@@ -28,11 +28,9 @@ class Downloader {
   final downloadController = StreamController<DownloadStatus>.broadcast();
   Stream<DownloadStatus> get downloadProgress => downloadController.stream;
   late final StreamSubscription<List<SharedFile>> _intentDataStreamSubscription;
-  late final StreamSubscription<dynamic> _portSubscription;
 
   void dispose() {
     _intentDataStreamSubscription.cancel();
-    _portSubscription.cancel();
     downloadController.close();
   }
 

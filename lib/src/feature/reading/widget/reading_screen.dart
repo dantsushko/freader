@@ -28,8 +28,13 @@ class ReadingScreen extends StatelessWidget {
               childAspectRatio: 0.75,
               children: books
                   .map(
-                    (book) => LargeCard(
-                      entity: book,
+                    (book) => InkWell(
+                      onTap: () => context.pushNamed('book', extra: {'id': book.book.bid.toString()}),
+                      child: AbsorbPointer(
+                        child: LargeCard(
+                          entity: book,
+                        ),
+                      ),
                     ),
                   )
                   .toList(),
