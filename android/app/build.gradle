@@ -43,7 +43,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.freader.freader"
+        applicationId "com.freader.dts"
         minSdkVersion 24 
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()

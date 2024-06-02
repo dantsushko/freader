@@ -1,4 +1,4 @@
-package com.freader.freader
+package com.freader.dts
 
 import io.flutter.embedding.android.FlutterActivity
 
