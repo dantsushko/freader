@@ -125,7 +125,7 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                                 showControls: showControls,
                                 title: snapshot.data?.title ?? '',
                                 book: snapshot.data),
-                           BottomBookBar(showControls: showControls, book: snapshot.data),
+                            BottomBookBar(showControls: showControls, book: snapshot.data),
                           ],
                         ),
                       ),
@@ -144,31 +144,29 @@ class BottomBookBar extends StatelessWidget {
   final ValueNotifier<bool> showControls;
   final CommonBook? book;
   @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: showControls,
-        builder: (ctx, show, child) {
-          if (!show) return const SizedBox.shrink();
-          return Positioned(
+  Widget build(BuildContext context) => ValueListenableBuilder(
+      valueListenable: showControls,
+      builder: (ctx, show, child) {
+        if (!show) return const SizedBox.shrink();
+        return BlocBuilder<ReaderNavigatorBloc, ReaderNavigatorState>(
+          builder: (context, state) => Positioned(
             bottom: 0,
             height: 50,
             child: Container(
               width: MediaQuery.of(context).size.width,
-            
               color: Theme.of(context).colorScheme.surface,
-              
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    Text('Current chapter'),
-                    const Spacer(),
-                    Text('22/2352')
+                    const Text('Current chapter'),
+                    Spacer(),
+                    Text('${state.page}/${state.totalPages}')
                   ],
                 ),
               ),
             ),
-          );
-        });
-  }
+          ),
+        );
+      });
 }

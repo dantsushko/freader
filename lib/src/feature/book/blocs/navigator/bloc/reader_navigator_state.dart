@@ -4,6 +4,8 @@ part of 'reader_navigator_bloc.dart';
 class ReaderNavigatorState with _$ReaderNavigatorState {
   const factory ReaderNavigatorState({
     required int chapterIndex,
-    required int position,
+    required int page,
+    required int scrollPosition,
+    required int totalPages,
   }) = _ReaderNavigatorState;
 }

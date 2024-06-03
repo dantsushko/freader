@@ -45,19 +45,20 @@ class _OpdsViewerState extends State<OpdsViewer> {
         _pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      _pagingController.error = error;
+      if(mounted){
+        _pagingController.error = error;
+      }
+      
     }
   }
 
   @override
-  Widget build(BuildContext context) => Expanded(
-    child: PagedListView<int, OpdsEntry>(
-      pagingController: _pagingController,
-      shrinkWrap: true,
-      builderDelegate: PagedChildBuilderDelegate<OpdsEntry>(
-        itemBuilder: (context, item, index) => OpdsCard(
-          entry: item,
-        ),
+  Widget build(BuildContext context) => PagedListView<int, OpdsEntry>(
+    pagingController: _pagingController,
+    shrinkWrap: true,
+    builderDelegate: PagedChildBuilderDelegate<OpdsEntry>(
+      itemBuilder: (context, item, index) => OpdsCard(
+        entry: item,
       ),
     ),
   );

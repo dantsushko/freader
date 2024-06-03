@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freader/src/core/data/database/daos/settings_dao.dart';
@@ -12,10 +13,43 @@ import 'package:freader/src/core/parser/fb2_parser/model/link.dart';
 import 'package:freader/src/core/parser/fb2_parser/model/section.dart';
 import 'package:freader/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
+import 'package:translator/translator.dart';
 import '../../../core/data/database/database.dart';
 import '../../../core/parser/fb2_parser/model/title.dart';
 import '../blocs/navigator/bloc/reader_navigator_bloc.dart';
+
+final translator = GoogleTranslator();
+
+class TooltipOverlay extends StatelessWidget {
+  final String message;
+  final Offset position;
+
+  TooltipOverlay({required this.message, required this.position});
+
+  @override
+  Widget build(BuildContext context) => Positioned(
+        left: position.dx,
+        top: position.dy,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 50),
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              child: Text(
+                message,
+                softWrap: true,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      );
+}
 
 class FB2Screen extends StatefulWidget {
   const FB2Screen({
@@ -33,7 +67,7 @@ class FB2Screen extends StatefulWidget {
 class _FB2ScreenState extends State<FB2Screen> {
   final ItemScrollController _scrollController = ItemScrollController();
   late final FB2Book book;
-  late final PageController _pageController;
+  PageController? _pageController;
   late SettingsModel settings;
   late Cursor? cursor;
   double get fontSize => settings.fontSize.toDouble();
@@ -46,11 +80,13 @@ class _FB2ScreenState extends State<FB2Screen> {
   PageScrollStyle get pageScrollStyle => settings.pageScrollStyle;
   late final StreamSubscription<SettingsModel> subscription;
   final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+
+  List<Column> pages = [];
+
   @override
   void initState() {
     settings = DependenciesScope.dependenciesOf(context).database.settingsDao.initialSettings;
     itemPositionsListener.itemPositions.addListener(() async {
-      print(itemPositionsListener.itemPositions.value);
       await DependenciesScope.of(context).dependencies.database.cursorDao.updateCursor(
           bid: widget.bid,
           offset: itemPositionsListener.itemPositions.value.first.index.toDouble());
@@ -65,11 +101,18 @@ class _FB2ScreenState extends State<FB2Screen> {
     super.initState();
   }
 
-  Future<void> initCursor() async {
+  Future<void> init() async {
+    print('init');
     cursor =
         await DependenciesScope.of(context).dependencies.database.cursorDao.getCursor(widget.bid);
 
-    _pageController = PageController(initialPage: cursor?.page ?? 0);
+    _pageController ??= PageController(initialPage: cursor?.page ?? 0);
+    pages = await splitPages(book);
+    context.read<ReaderNavigatorBloc>().add(ReaderNavigatorEvent.updatePosition(
+          page: cursor?.page ?? 0,
+          totalPages: pages.length,
+          scrollPosition: cursor?.offset.toInt() ?? 0,
+        ));
   }
 
   @override
@@ -95,33 +138,31 @@ class _FB2ScreenState extends State<FB2Screen> {
         );
 
       case PageScrollStyle.shift:
-        return FutureBuilder(
-          future: splitPages(book),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final pages = snapshot.data!;
-            return PageView.builder(
-              controller: _pageController,
-              onPageChanged: (page) => DependenciesScope.of(context)
-                  .dependencies
-                  .database
-                  .cursorDao
-                  .updateCursor(bid: widget.bid, page: page),
-              itemCount: pages.length,
-              itemBuilder: (context, index) => pages[index],
-            );
+        return PageView.builder(
+          controller: _pageController,
+          onPageChanged: (page) {
+            context.read<ReaderNavigatorBloc>().add(ReaderNavigatorEvent.updatePosition(
+                  page: page,
+                ));
+
+            DependenciesScope.of(context)
+                .dependencies
+                .database
+                .cursorDao
+                .updateCursor(bid: widget.bid, page: page);
           },
+          itemCount: pages.length,
+          itemBuilder: (context, index) => pages[index],
         );
       default:
         return Center(child: Text('Unsupported scroll style: $pageScrollStyle'));
     }
   }
 
+  String selectedText = '';
   @override
   Widget build(BuildContext context) => FutureBuilder(
-        future: initCursor(),
+        future: init(),
         builder: (
           ctx,
           snapshot,
@@ -134,7 +175,43 @@ class _FB2ScreenState extends State<FB2Screen> {
             listener: (context, state) {
               _scrollController.jumpTo(index: state.chapterIndex);
             },
+            listenWhen: (previous, current) => previous.chapterIndex != current.chapterIndex,
             child: SelectionArea(
+              onSelectionChanged: (value) => selectedText = value?.plainText ?? '',
+              contextMenuBuilder: (ctx, regionState) => AdaptiveTextSelectionToolbar.buttonItems(
+                  anchors: regionState.contextMenuAnchors,
+                  buttonItems: [
+                    ContextMenuButtonItem(
+                      onPressed: () async {
+                        ContextMenuController.removeAny();
+                        if (selectedText.isEmpty) return;
+                        final translation = await translator.translate(selectedText, to: 'en');
+                        final translatedText = translation.text;
+
+                        final overlay = Overlay.of(regionState.context);
+                        final overlayEntry = OverlayEntry(
+                          builder: (context) => TooltipOverlay(
+                            message: translatedText,
+                            position: regionState.selectionEndpoints.first.point,
+                          ),
+                        );
+
+                        overlay?.insert(overlayEntry);
+
+                        await Future.delayed(Duration(seconds: 2));
+                        overlayEntry.remove();
+                      },
+                      label: 'Перевести',
+                    ),
+                    ContextMenuButtonItem(
+                      onPressed: () {},
+                      label: 'Копировать',
+                    ),
+                    ContextMenuButtonItem(
+                      onPressed: () {},
+                      label: 'Определение',
+                    )
+                  ]),
               child: Padding(
                 padding: EdgeInsets.only(
                   left: pageHorizontalPadding,
@@ -170,15 +247,10 @@ class _FB2ScreenState extends State<FB2Screen> {
     if (element is FB2EmtpyLine) {
       return const SizedBox(height: 16);
     }
-    int i = 0;
     if (element is FB2Paragraph) {
       final spans = <InlineSpan>[];
       for (final e in element.elements) {
         if (e is FB2Text) {
-          if (i < 10) {
-            print(e.text);
-            i++;
-          }
           spans.add(
             TextSpan(
               text: settings.softHyphen ? split(e.text) : e.text,
