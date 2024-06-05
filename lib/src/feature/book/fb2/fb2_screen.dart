@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import '../../../core/parser/fb2_parser/model/title.dart';
 import '../blocs/navigator/bloc/reader_navigator_bloc.dart';
 
 final translator = GoogleTranslator();
+final Map<String, List<Widget>> pageCache = {};
 
 class TooltipOverlay extends StatelessWidget {
   final String message;
@@ -52,19 +54,21 @@ class TooltipOverlay extends StatelessWidget {
 }
 
 class FB2Screen extends StatefulWidget {
-  const FB2Screen({
+  FB2Screen({
     required this.book,
     super.key,
     required this.bid,
   });
   final FB2Book book;
   final int bid;
-
+  final indexes = <int, List<int>>{};
   @override
   State<FB2Screen> createState() => _FB2ScreenState();
 }
 
-class _FB2ScreenState extends State<FB2Screen> {
+class _FB2ScreenState extends State<FB2Screen> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   final ItemScrollController _scrollController = ItemScrollController();
   late final FB2Book book;
   PageController? _pageController;
@@ -80,39 +84,51 @@ class _FB2ScreenState extends State<FB2Screen> {
   PageScrollStyle get pageScrollStyle => settings.pageScrollStyle;
   late final StreamSubscription<SettingsModel> subscription;
   final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+  late final AppDatabase database;
+  late final ReaderNavigatorBloc readerNavigatorBloc;
+  List<Widget> pages = [];
 
-  List<Column> pages = [];
+  Future<List<Widget>> getCachedPages(FB2Book book) async {
+    final cacheKey =
+        '${widget.bid}_${settings.fontSize}_${settings.pageHorizontalPadding}_${settings.pageTopPadding}_${settings.pageBottomPadding}_${settings.letterSpacing}';
+    if (pageCache.containsKey(cacheKey)) {
+      return pageCache[cacheKey]!;
+    }
+    final splitPagesResult = await splitPages(book);
+    pageCache[cacheKey] = splitPagesResult;
+    readerNavigatorBloc.add(ReaderNavigatorEvent.updatePosition(
+      totalPages: splitPagesResult.length,
+    ));
+    return splitPagesResult;
+  }
 
   @override
   void initState() {
-    settings = DependenciesScope.dependenciesOf(context).database.settingsDao.initialSettings;
+    database = DependenciesScope.dependenciesOf(context).database;
+    readerNavigatorBloc = context.read<ReaderNavigatorBloc>();
+
+    settings = database.settingsDao.initialSettings;
     itemPositionsListener.itemPositions.addListener(() async {
-      await DependenciesScope.of(context).dependencies.database.cursorDao.updateCursor(
+      await database.cursorDao.updateCursor(
           bid: widget.bid,
           offset: itemPositionsListener.itemPositions.value.first.index.toDouble());
     });
-    subscription = DependenciesScope.dependenciesOf(context)
-        .database
-        .settingsDao
-        .watch()
-        .listen((event) => setState(() => settings = event));
+    subscription = database.settingsDao.watch().listen((event) => setState(() {
+          settings = event;
+        }));
     book = widget.book;
 
     super.initState();
   }
 
   Future<void> init() async {
-    print('init');
-    cursor =
-        await DependenciesScope.of(context).dependencies.database.cursorDao.getCursor(widget.bid);
-
-    _pageController ??= PageController(initialPage: cursor?.page ?? 0);
-    pages = await splitPages(book);
-    context.read<ReaderNavigatorBloc>().add(ReaderNavigatorEvent.updatePosition(
-          page: cursor?.page ?? 0,
-          totalPages: pages.length,
-          scrollPosition: cursor?.offset.toInt() ?? 0,
-        ));
+    await getCachedPages(book);
+    cursor = await database.cursorDao.getCursor(widget.bid);
+    _pageController ??= PageController(initialPage: cursor?.page ?? 0, viewportFraction: 1.05);
+    readerNavigatorBloc.add(ReaderNavigatorEvent.updatePosition(
+      page: cursor?.page ?? 0,
+      scrollPosition: cursor?.offset.toInt() ?? 0,
+    ));
   }
 
   @override
@@ -138,21 +154,29 @@ class _FB2ScreenState extends State<FB2Screen> {
         );
 
       case PageScrollStyle.shift:
-        return PageView.builder(
-          controller: _pageController,
-          onPageChanged: (page) {
-            context.read<ReaderNavigatorBloc>().add(ReaderNavigatorEvent.updatePosition(
+        return FutureBuilder<List<Widget>>(
+          future: getCachedPages(book),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            pages = snapshot.data!;
+            return PageView.builder(
+              controller: _pageController,
+              onPageChanged: (page) {
+                readerNavigatorBloc.add(ReaderNavigatorEvent.updatePosition(
                   page: page,
                 ));
 
-            DependenciesScope.of(context)
-                .dependencies
-                .database
-                .cursorDao
-                .updateCursor(bid: widget.bid, page: page);
+                database.cursorDao.updateCursor(bid: widget.bid, page: page);
+              },
+              allowImplicitScrolling: true,
+              itemCount: pages.length,
+              itemBuilder: (context, index) => FractionallySizedBox(
+                widthFactor: 1 / _pageController!.viewportFraction,
+                child: pages[index]),
+            );
           },
-          itemCount: pages.length,
-          itemBuilder: (context, index) => pages[index],
         );
       default:
         return Center(child: Text('Unsupported scroll style: $pageScrollStyle'));
@@ -161,83 +185,88 @@ class _FB2ScreenState extends State<FB2Screen> {
 
   String selectedText = '';
   @override
-  Widget build(BuildContext context) => FutureBuilder(
-        future: init(),
-        builder: (
-          ctx,
-          snapshot,
-        ) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  Widget build(BuildContext context) {
+    super.build(context);
+    return FutureBuilder(
+      future: init(),
+      builder: (
+        ctx,
+        snapshot,
+      ) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          return BlocListener<ReaderNavigatorBloc, ReaderNavigatorState>(
-            listener: (context, state) {
-              _scrollController.jumpTo(index: state.chapterIndex);
-            },
-            listenWhen: (previous, current) => previous.chapterIndex != current.chapterIndex,
-            child: SelectionArea(
-              onSelectionChanged: (value) => selectedText = value?.plainText ?? '',
-              contextMenuBuilder: (ctx, regionState) => AdaptiveTextSelectionToolbar.buttonItems(
-                  anchors: regionState.contextMenuAnchors,
-                  buttonItems: [
-                    ContextMenuButtonItem(
-                      onPressed: () async {
-                        ContextMenuController.removeAny();
-                        if (selectedText.isEmpty) return;
-                        final translation = await translator.translate(selectedText, to: 'en');
-                        final translatedText = translation.text;
+        return BlocListener<ReaderNavigatorBloc, ReaderNavigatorState>(
+          listener: (context, state) {
+            _scrollController.jumpTo(index: state.chapterIndex);
+          },
+          listenWhen: (previous, current) => previous.chapterIndex != current.chapterIndex,
+          child: SelectionArea(
+            onSelectionChanged: (value) => selectedText = value?.plainText ?? '',
+            contextMenuBuilder: (ctx, regionState) => AdaptiveTextSelectionToolbar.buttonItems(
+                anchors: regionState.contextMenuAnchors,
+                buttonItems: [
+                  ContextMenuButtonItem(
+                    onPressed: () async {
+                      ContextMenuController.removeAny();
+                      if (selectedText.isEmpty) return;
+                      final translation = await translator.translate(selectedText, to: 'en');
+                      final translatedText = translation.text;
 
-                        final overlay = Overlay.of(regionState.context);
-                        final overlayEntry = OverlayEntry(
-                          builder: (context) => TooltipOverlay(
-                            message: translatedText,
-                            position: regionState.selectionEndpoints.first.point,
-                          ),
-                        );
+                      final overlay = Overlay.of(regionState.context);
+                      final overlayEntry = OverlayEntry(
+                        builder: (context) => TooltipOverlay(
+                          message: translatedText,
+                          position: regionState.selectionEndpoints.first.point,
+                        ),
+                      );
 
-                        overlay?.insert(overlayEntry);
+                      overlay?.insert(overlayEntry);
 
-                        await Future.delayed(Duration(seconds: 2));
-                        overlayEntry.remove();
-                      },
-                      label: 'Перевести',
-                    ),
-                    ContextMenuButtonItem(
-                      onPressed: () {},
-                      label: 'Копировать',
-                    ),
-                    ContextMenuButtonItem(
-                      onPressed: () {},
-                      label: 'Определение',
-                    )
-                  ]),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: pageHorizontalPadding,
-                  right: pageHorizontalPadding,
-                  top: pageTopPadding,
-                  bottom: pageBottomPadding,
-                ),
-                child: getScrollingWidget(),
+                      await Future.delayed(Duration(seconds: 2));
+                      overlayEntry.remove();
+                    },
+                    label: 'Перевести',
+                  ),
+                  ContextMenuButtonItem(
+                    onPressed: () {},
+                    label: 'Копировать',
+                  ),
+                  ContextMenuButtonItem(
+                    onPressed: () {},
+                    label: 'Определение',
+                  )
+                ]),
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: pageHorizontalPadding,
+                right: pageHorizontalPadding,
+                top: pageTopPadding,
+                bottom: pageBottomPadding,
               ),
+              child: getScrollingWidget(),
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
+  }
 
   Widget _buildFB2ElementWidget(FB2Element element) {
     if (element is FB2Image) {
       return Image.memory(element.bytes);
     }
     if (element is FB2Title) {
-      return Text(
-        element.text,
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize),
+      return Align(
+        child: Text(
+          element.text,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize),
+        ),
       );
     }
     if (element is FB2Subtitle) {
-      return Center(
+      return Align(
         child: Text(
           element.text,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: subtitleFontSize),
@@ -301,68 +330,154 @@ class _FB2ScreenState extends State<FB2Screen> {
     return Text(element.runtimeType.toString());
   }
 
-  Future<List<Column>> splitPages(FB2Book book) async {
-    final pageHeight = MediaQuery.of(context).size.height - pageTopPadding - pageBottomPadding;
+  Future<List<Widget>> splitPages(FB2Book book) async {
+    double paddingTop = MediaQueryData.fromView(ui.window).padding.top;
+    double paddingBottom = MediaQueryData.fromView(ui.window).padding.bottom;
+
+    final pageHeight = MediaQuery.of(context).size.height -
+        paddingTop -
+        paddingBottom -
+        pageTopPadding -
+        pageBottomPadding;
     final pageWidth = MediaQuery.of(context).size.width - settings.pageHorizontalPadding * 2;
-    final pages = <Column>[];
+    final pages = <Widget>[];
     var pageChildren = <Widget>[];
     num totalHeight = 0;
 
     for (final e in book.elements) {
       final height = await getHeight(e, pageWidth);
+
       if (totalHeight + height > pageHeight) {
-        pages.add(
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.from(pageChildren),
-          ),
-        );
-        pageChildren = [];
-        totalHeight = 0;
+        // If the current element does not fit, split it
+        if (e is FB2Paragraph && e.text.isNotEmpty) {
+          final splitIndex = getSplitIndex(e.text, pageWidth, pageHeight - totalHeight);
+          final newParagraphs = e.split(splitIndex);
+          pageChildren.add(_buildFB2ElementWidget(newParagraphs.first));
+          pages.add(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: List.from(pageChildren),
+            ),
+          );
+
+          pageChildren = [_buildFB2ElementWidget(newParagraphs.last)];
+          totalHeight = await getHeight(newParagraphs.last, pageWidth);
+        } else {
+          pages.add(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: List.from(pageChildren),
+            ),
+          );
+          pageChildren = [_buildFB2ElementWidget(e)];
+          totalHeight = height;
+        }
+      } else {
+        pageChildren.add(_buildFB2ElementWidget(e));
+        totalHeight += height;
       }
-      totalHeight += height;
-      pageChildren.add(_buildFB2ElementWidget(e));
     }
 
     if (pageChildren.isNotEmpty) {
       pages.add(
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: List.from(pageChildren)),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.from(pageChildren),
+        ),
       );
     }
+
     return pages;
   }
 
-  Future<num> getHeight(FB2Element element, double pageWidth) async {
+  Future<num> getHeight(FB2Element element, double width, {String? text}) async {
     await Future.delayed(Duration.zero);
     if (element is FB2EmtpyLine) {
       return 16;
     }
     if (element is FB2Image) {
-      final h = 900;
-      return h;
+      final completer = Completer<ui.Image>();
+      ui.decodeImageFromList(element.bytes, completer.complete);
+      final image2 = await completer.future;
+      return image2.height;
     }
     if (element is FB2Paragraph) {
       num totalHeight = 8;
       for (final childElement in element.elements) {
-        totalHeight += await getHeight(childElement, pageWidth);
+        totalHeight += await getHeight(childElement, width);
       }
       return totalHeight;
     }
+
     if (element is FB2Text || element is FB2Link || element is FB2Title || element is FB2Subtitle) {
+      final fontSize = element is FB2Subtitle
+          ? subtitleFontSize
+          : element is FB2Title
+              ? titleFontSize
+              : this.fontSize;
+
       final textPainter = TextPainter(
+        textAlign: TextAlign.justify,
         text: TextSpan(
-          text: element.text,
+          text: text ?? element.text,
           style: TextStyle(
             wordSpacing: 4,
             letterSpacing: letterSpacing,
             fontStyle: FontStyle.normal,
+            fontWeight:
+                element is FB2Subtitle || element is FB2Title ? FontWeight.bold : FontWeight.normal,
             fontSize: fontSize,
           ),
         ),
         textDirection: TextDirection.ltr,
-      )..layout(maxWidth: pageWidth);
-      return textPainter.size.height;
+      )..layout(maxWidth: width);
+      final h = textPainter.size.height;
+      textPainter.dispose();
+      return h;
     }
     return 0;
+  }
+
+  int getSplitIndex(String text, double pageWidth, double availableHeight) {
+    final textPainter = TextPainter(textDirection: TextDirection.ltr, textAlign: TextAlign.justify);
+
+    if (text.isEmpty) return 0;
+
+    int start = 0;
+    int end = text.length;
+    int splitIndex = end;
+
+    while (start < end) {
+      int mid = (start + end) ~/ 2;
+      textPainter.text = TextSpan(
+        text: text.substring(0, mid),
+        style: TextStyle(
+          wordSpacing: 4,
+          letterSpacing: letterSpacing,
+          fontStyle: FontStyle.normal,
+          fontSize: fontSize,
+        ),
+      );
+
+      textPainter.layout(maxWidth: pageWidth);
+
+      if (textPainter.size.height > availableHeight) {
+        end = mid;
+      } else {
+        splitIndex = mid;
+        start = mid + 1;
+      }
+
+      if (start == end && textPainter.size.height > availableHeight) {
+        splitIndex = start;
+        break;
+      }
+    }
+
+    while (splitIndex > 0 && !text[splitIndex - 1].contains(RegExp(r'\s'))) {
+      splitIndex--;
+    }
+    textPainter.dispose();
+    return splitIndex;
   }
 }

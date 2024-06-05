@@ -13,16 +13,12 @@ class FB2Image extends FB2Element{
     name = image.getAttribute('id') ?? '';
   }
   FB2Image.empty() : base64 = '', type = FB2ImageType.png, name = '';
-  /// image in base64
   late final String base64;
   Uint8List get bytes => base64Decode(base64.replaceAll(RegExp(r'\s+'), ''));
-
-  /// content type (png or jpeg)
   late final FB2ImageType type;
-
-  /// image name
   late final String name;
-  double height = 0;
+
+  
   @override
   String toString() => 'FB2Image(name: $name)';
 }

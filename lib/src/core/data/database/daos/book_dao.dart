@@ -3,8 +3,12 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/data/database/tables.dart';
+import 'package:freader/src/core/parser/model/author.dart';
+import 'package:freader/src/core/parser/model/book_metadata.dart';
 import 'package:freader/src/core/parser/parser.dart';
 import 'package:freader/src/core/utils/dominant_color.dart';
+import 'package:freader/src/core/utils/path.dart';
+import 'package:l/l.dart';
 
 part 'book_dao.g.dart';
 
@@ -17,25 +21,28 @@ class BookWithMetadata {
       'BookWithMetadata(book: ${book.filename}, dir: ${book.directory} metadata: ${metadata.language})';
 }
 
-@DriftAccessor(tables: [BookEntries, MetadataEntries])
+@DriftAccessor(tables: [BookEntries, MetadataEntries, AuthorEntries, BookAuthorEntries])
 class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
   BookDao(super.db);
 
-  Future<void> importBook(CommonBook book) async {
+  Future<void> importBook(BookMetadata metadata, String filePath) async {
+    final fileName = getFileName(filePath);
+    l.i('importing book: $fileName');
     final existingBook =
-        await (select(bookEntries)..where((tbl) => tbl.filename.equals(book.fileName))).get();
+        await (select(bookEntries)..where((tbl) => tbl.filename.equals(fileName))).get();
     if (existingBook.isNotEmpty) {
+      l.s('book $fileName already exists');
       return;
     }
-    final dominantColors = DominantColor.get(book.cover);
+    final dominantColors = DominantColor.get(metadata.cover);
     final newBook = BookEntriesCompanion.insert(
       timestamp: 0,
-      filename: book.fileName,
-      filepath: book.filePath,
-      cover: Value(book.cover),
-      filesize: File(book.filePath).lengthSync(),
-      directory: Value(book.directory),
-      format: book.format,
+      filename: fileName,
+      filepath: filePath,
+      cover: Value(metadata.cover),
+      filesize: File(filePath).lengthSync(),
+      directory: Value(getDirName(filePath)),
+      format: metadata.format,
       coverDominantColor1: dominantColors.first.value,
       coverDominantColor2: dominantColors.last.value,
       coverFontColor: DominantColor.getReverseWhiteOrBlack(dominantColors.first).value,
@@ -44,10 +51,10 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
     final bid = await into(bookEntries).insert(newBook);
     final metaData = MetadataEntriesCompanion.insert(
       bid: bid,
-      title: book.title,
-      language: book.language,
-      published: book.published,
-      annotation: book.annotation,
+      title: metadata.title,
+      language: 'book.language',
+      published: 'book.published',
+      annotation: metadata.annotation,
       keywords: '',
       source: '',
       pagecount: 100,
@@ -60,6 +67,19 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
       timestamp: 0,
     );
     await into(metadataEntries).insert(metaData);
+
+    for (final author in metadata.authors) {
+      final existingAuthor = await (select(authorEntries)
+            ..where((tbl) => tbl.nameKey.equals(author.nameKey)))
+          .getSingleOrNull();
+      final aid = existingAuthor?.aid ??
+          await into(authorEntries).insert(AuthorEntriesCompanion.insert(
+              name: author.name ?? '',
+              nameKey: author.nameKey,
+              secondName: Value(author.secondName),
+              lastName: author.lastName ?? ''));
+      await into(bookAuthorEntries).insert(BookAuthorEntriesCompanion.insert(bid: bid, aid: aid));
+    }
   }
 
   Future<void> deleteBook(String filePath) async {
@@ -102,8 +122,9 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
       query.where(bookEntries.directory.equals(directory));
     }
     if (lastRead) {
-      query.orderBy([OrderingTerm.desc(metadataEntries.timestamp)]);
-      query.where(metadataEntries.timestamp.isBiggerThanValue(0));
+      query
+        ..orderBy([OrderingTerm.desc(metadataEntries.timestamp)])
+        ..where(metadataEntries.timestamp.isBiggerThanValue(0));
     }
     return query.watch().map(
           (books) => books

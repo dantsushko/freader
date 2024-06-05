@@ -18,4 +18,10 @@ class FB2TitleInfo {
   late final List<FB2Author> authors;
   late final String bookTitle;
   late final DateTime? publishDate;
+
+  @override
+  String toString() {
+    return 'FB2TitleInfo{annotation: $annotation, language: $language, genres: $genres, authors: $authors, bookTitle: $bookTitle, publishDate: $publishDate}';
+  
+  }
 }

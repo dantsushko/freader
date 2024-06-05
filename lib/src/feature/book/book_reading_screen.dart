@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freader/src/core/data/database/database.dart';
+import 'package:freader/src/core/parser/model/common_book.dart';
 import 'package:freader/src/core/parser/parser.dart';
 import 'package:freader/src/feature/book/epub/epub_screen.dart';
 import 'package:freader/src/feature/catalogues/opds/util.dart';
@@ -104,7 +105,7 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                     if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                     final book = snapshot.data!;
                     return BlocProvider(
-                      create: (context) => ReaderNavigatorBloc(),
+                      create: (context) => ReaderNavigatorBloc(database: DependenciesScope.dependenciesOf(context).database),
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         child: Stack(
@@ -161,7 +162,7 @@ class BottomBookBar extends StatelessWidget {
                   children: [
                     const Text('Current chapter'),
                     Spacer(),
-                    Text('${state.page}/${state.totalPages}')
+                    Text('${state.page + 1}/${state.totalPages}')
                   ],
                 ),
               ),

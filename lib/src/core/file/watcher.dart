@@ -30,13 +30,14 @@ class FileWatcher {
     for (final dir in dirsToWatch) {
       for (final d in Directory(dir).listSync()) {
         if (isBook(d.path)) {
-          
           final exists = await db.bookDao.bookExists(d.path);
           l.i('check book: exists $exists');
           if (!exists) {
-            final book = await compute(Parser().parse, d.path);
-            if (book != null) {
-              await db.bookDao.importBook(book);
+            final metadata = await compute(Parser().parseMetadata, d.path);
+            
+            // final book = await compute(Parser().parse, d.path);
+            if (metadata != null) {
+              await db.bookDao.importBook(metadata, d.path);
             } else {
               File(d.path).deleteSync();
             }
@@ -49,10 +50,19 @@ class FileWatcher {
   Future<void> onEvent(WatchEvent event, String dir) async {
     if (event.type == ChangeType.ADD) {
       if (isBook(event.path)) {
-        final parsedBook = await compute(Parser().parse, event.path);
-        if (parsedBook != null) {
-          l.i('importing book');
-          await db.bookDao.importBook(parsedBook);
+        // final parsedBook = await compute(Parser().parse, event.path);
+        // if (parsedBook != null) {
+        //   l.i('importing book');
+        //   await db.bookDao.importBook(parsedBook);
+        // } else {
+        //   File(event.path).deleteSync();
+        // }
+
+        l.i('parsing metadata...');
+        final metadata = await compute(Parser().parseMetadata, event.path);
+        l.i('parsed metadata');
+        if (metadata != null) {
+          await db.bookDao.importBook(metadata, event.path);
         } else {
           File(event.path).deleteSync();
         }

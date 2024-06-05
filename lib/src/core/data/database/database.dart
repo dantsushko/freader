@@ -18,6 +18,8 @@ part 'database.g.dart';
   ThemeEntries,
   SettingsEntries,
   CursorEntries,
+  BookAuthorEntries,
+  AuthorEntries,
 ], daos: [
   OpdsDao,
   BookDao,

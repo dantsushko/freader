@@ -14,11 +14,11 @@ String split(String sentence, {String separator = '\u{00AD}'}) {
     final wordMatch = RegExp(r'[^\p{P}\s]+', unicode: true).firstMatch(w);
     final postfixMatch = RegExp(r'\p{P}+$', unicode: true).firstMatch(w);
 
-    String prefix = prefixMatch != null ? prefixMatch.group(0)! : '';
-    String word = wordMatch != null ? wordMatch.group(0)! : '';
-    String postfix = postfixMatch != null ? postfixMatch.group(0)! : '';
+    final prefix = prefixMatch != null ? prefixMatch.group(0)! : '';
+    final word = wordMatch != null ? wordMatch.group(0)! : '';
+    final postfix = postfixMatch != null ? postfixMatch.group(0)! : '';
 
-    String splitted = splitWord(word).join(separator);
+    final splitted = splitWord(word).join(separator);
     res.add('$prefix$splitted$postfix');
   }
   return res.join(' ');
@@ -62,8 +62,50 @@ class FB2Paragraph extends FB2Element {
   void add(FB2Element element) {
     _elements.add(element);
   }
-}
 
+  FB2Paragraph({List<FB2Element> elements = const []}) {
+    _elements.addAll(elements);
+  }
+
+    List<FB2Paragraph> split(int splitIndex) {
+    var currentIndex = 0;
+    final firstPart = <FB2Element>[];
+    final secondPart = <FB2Element>[];
+
+    for (final element in _elements) {
+      if (currentIndex + element.text.length <= splitIndex) {
+        firstPart.add(element);
+      } else if (currentIndex >= splitIndex) {
+        secondPart.add(element);
+      } else {
+        final splitPoint = splitIndex - currentIndex;
+        if (element is FB2Text) {
+          final firstText = FB2Text(element.text.substring(0, splitPoint), emphasis: element.emphasis);
+          final secondText = FB2Text(element.text.substring(splitPoint), emphasis: element.emphasis);
+          firstPart.add(firstText);
+          secondPart.add(secondText);
+        // } else if (element is FB2Link) {
+        //   var firstText = FB2Text(element.text.substring(0, splitPoint));
+        //   var secondText = FB2Text(element.text.substring(splitPoint));
+        //   firstPart.add(FB2Link.fromText(firstText, element.));
+        //   secondPart.add(FB2Link.fromText(secondText, element.href));
+        }
+      }
+      currentIndex += element.text.length;
+    }
+
+    return [FB2Paragraph(elements: firstPart), FB2Paragraph(elements: secondPart)];
+  }
+
+}
+int findWordSplitIndex(String text) {
+  for (var i = text.length - 1; i >= 0; i--) {
+    if (RegExp(r'\w').hasMatch(text[i])) {
+      return i;
+    }
+  }
+  return -1;
+}
 int index = 0;
 
 class FB2Section {

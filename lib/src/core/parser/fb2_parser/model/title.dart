@@ -6,12 +6,10 @@ class FB2Title extends FB2Element {
   FB2Title(this.index, XmlElement element) {
     text = element.findAllElements('p').map((e) => e.innerText).join('\n');
   }
-  late final String text;
 }
 
 class FB2Subtitle extends FB2Element {
   FB2Subtitle(XmlElement element) {
     text = element.innerText;
   }
-  late final String text;
 }

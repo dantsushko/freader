@@ -91,18 +91,26 @@ class SettingsEntries extends Table with AutoIncrementingPrimaryKey {
   IntColumn get letterSpacing => integer()();
   IntColumn get bookCardType => intEnum<BookCardType>()();
   BoolColumn get softHyphen => boolean()();
-
 }
-
-
 
 @DataClassName('Cursor')
 class CursorEntries extends Table {
   IntColumn get bid => integer().references(BookEntries, #bid, onDelete: KeyAction.cascade)();
   IntColumn get page => integer()();
   RealColumn get offset => real()();
-
 }
 
+@DataClassName('Author')
+class AuthorEntries extends Table {
+  IntColumn get aid => integer().autoIncrement()();
+  TextColumn get nameKey => text()();
+  TextColumn get name => text()();
+  TextColumn get secondName => text().nullable()();
+  TextColumn get lastName => text()();
+}
 
-
+@DataClassName('BookAuthor')
+class BookAuthorEntries extends Table {
+  IntColumn get bid => integer().references(BookEntries, #bid, onDelete: KeyAction.cascade)();
+  IntColumn get aid => integer().references(AuthorEntries, #aid, onDelete: KeyAction.cascade)();
+}

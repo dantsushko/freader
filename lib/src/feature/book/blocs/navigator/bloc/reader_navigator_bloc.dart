@@ -1,14 +1,16 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
-
+import 'package:freader/src/core/data/database/database.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'reader_navigator_bloc.freezed.dart';
 part 'reader_navigator_event.dart';
 part 'reader_navigator_state.dart';
-part 'reader_navigator_bloc.freezed.dart';
 
 class ReaderNavigatorBloc extends Bloc<ReaderNavigatorEvent, ReaderNavigatorState> {
-  ReaderNavigatorBloc() : super(const ReaderNavigatorState(chapterIndex: 0, scrollPosition: 0, page: 0, totalPages: 0)) {
+
+  final AppDatabase database;
+
+  ReaderNavigatorBloc({required this.database}) : super(const ReaderNavigatorState(chapterIndex: 0, scrollPosition: 0, page: 0, totalPages: 0)) {
     on<ReaderNavigatorEvent>((event, emit) {
       event.map(
         updatePosition: (e) {

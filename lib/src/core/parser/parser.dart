@@ -4,6 +4,9 @@ import 'package:archive/archive.dart';
 import 'package:collection/collection.dart';
 // import 'package:epubx/epubx.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freader/src/core/parser/fb2_parser/model/fb2_metadata.dart';
+import 'package:freader/src/core/parser/model/book_metadata.dart';
+import 'package:freader/src/core/parser/model/common_book.dart';
 import 'package:freader/src/core/parser/toc.dart';
 import 'package:freader/src/core/utils/path.dart';
 import 'package:freader/src/feature/catalogues/opds/util.dart';
@@ -11,51 +14,25 @@ import 'package:l/l.dart';
 
 import 'fb2_parser/fb2_parser.dart';
 
-class CommonBook {
-  CommonBook.fromFb2(FB2Book fb2Book, this.downloadUrl, this.path)
-      : title = fb2Book.bookTitle,
-        language = fb2Book.language ?? '',
-        published = fb2Book.publishDate ?? '',
-        directory = getDirName(path),
-        fileName = getFileName(path),
-        format = 'fb2',
-        fb2book = fb2Book,
-        annotation = fb2Book.description.titleInfo.annotation,
-        toc = TableOfContents.fromFB2(fb2Book),
-        cover = fb2Book.cover.bytes,
-        filePath = path;
-  // CommonBook.fromEpub(this.epubBook, this.downloadUrl, this.path)
-  //     : title = epubBook!.Title ?? '',
-  //       language = epubBook.Schema?.Package?.Metadata?.Languages?.firstOrNull ?? '',
-  //       published = epubBook.Schema?.Package?.Metadata?.Dates?.firstOrNull?.Date ?? '',
-  //       directory = getDirName(path),
-  //       fileName = getFileName(path),
-  //       format = 'epub',
-  //       filePath = path,
-  //       annotation = epubBook.Schema?.Package?.Metadata?.Description ?? 'No annotation',
-  //       cover = epubBook.CoverImage?.getBytes() ?? Uint8List(0);
-  String title;
-  String path;
-  String? downloadUrl;
-  String format;
-  String language;
-  String published;
-  String directory;
-  String fileName;
-  String filePath;
-  Uint8List cover;
-  String annotation;
-  FB2Book? fb2book;
-  // EpubBook? epubBook;
-  int wordCount = 0;
-  TableOfContents? toc;
-}
+
+
+
 
 class Parser {
   Parser({this.downloadUrl});
   FB2Book? fb2Book;
   String? downloadUrl;
   int attempts = 0;
+
+  Future<BookMetadata?> parseMetadata(String filePath) async {
+    final format = getBookFormat(filePath);
+    if (format == BookFormat.fb2) {
+      final bytes = await getFb2Bytes(filePath);
+      var fbMetaData = await compute(parseFB2MetaData, bytes);
+      return BookMetadata.fromFb2Metadata(fbMetaData);
+    }
+  }
+
   Future<CommonBook?> parse(String filePath) async {
     final format = getBookFormat(filePath);
     // if (format == BookFormat.epub) {
@@ -69,28 +46,21 @@ class Parser {
     //   }
     // }
     if (format == BookFormat.fb2) {
-      final file = File(filePath);
-      if(!file.existsSync()) throw Exception('File not found');
-      var bytes = File(filePath).readAsBytesSync();
-      if (filePath.contains('zip')) {
-        try {
-          attempts++;
-          final archive = ZipDecoder().decodeBytes(bytes);
-          bytes = archive.first.content as Uint8List;
-        } on FormatException {
-          l.i('archive not ready');
-          if (attempts <= 5) {
-            await Future<void>.delayed(const Duration(seconds: 1));
-            return parse(filePath);
-          }
-          attempts = 0;
-          return null;
-        }
-      }
-
+      final bytes = await getFb2Bytes(filePath);
       fb2Book = await compute(parseFB2, bytes);
       return CommonBook.fromFb2(fb2Book!, downloadUrl, filePath);
     }
     return null;
   }
+}
+
+Future<Uint8List> getFb2Bytes(String filePath) async {
+  final file = File(filePath);
+  if (!file.existsSync()) throw Exception('File not found');
+  var bytes = await File(filePath).readAsBytes();
+  if (filePath.contains('zip')) {
+    final archive = ZipDecoder().decodeBytes(bytes);
+    bytes = archive.first.content as Uint8List;
+  }
+  return bytes;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freader/src/core/parser/model/common_book.dart';
 import 'package:freader/src/core/parser/parser.dart';
 import 'package:freader/src/feature/book/blocs/navigator/bloc/reader_navigator_bloc.dart';
 import 'package:freader/src/feature/book/settings/book_settings_screen.dart';
