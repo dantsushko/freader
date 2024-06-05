@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freader/src/core/constants/constants.dart';
 import 'package:freader/src/core/data/database/database.dart';
 import 'package:freader/src/core/parser/model/common_book.dart';
 import 'package:freader/src/core/parser/parser.dart';
@@ -13,7 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'blocs/navigator/bloc/reader_navigator_bloc.dart';
 import 'fb2/fb2_screen.dart';
 import 'floating_app_bar.dart';
-
+import 'package:path/path.dart' as path;
 class BookReadingScreen extends StatefulWidget {
   const BookReadingScreen({required this.bookId, super.key});
   final int bookId;
@@ -67,7 +68,7 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
   Future<CommonBook?> getBook() async {
     final bookWithMetadata = await _db.bookDao.getBook(widget.bookId);
     await _db.bookDao.updateTimestamp(widget.bookId);
-    return compute(Parser().parse, bookWithMetadata.book.filepath);
+    return compute(Parser().parse, path.join(baseDirPath, bookWithMetadata.book.filepath));
   }
 
   Stopwatch stopwatch = Stopwatch();
@@ -105,7 +106,8 @@ class _BookReadingScreenState extends State<BookReadingScreen> {
                     if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                     final book = snapshot.data!;
                     return BlocProvider(
-                      create: (context) => ReaderNavigatorBloc(database: DependenciesScope.dependenciesOf(context).database),
+                      create: (context) => ReaderNavigatorBloc(
+                          database: DependenciesScope.dependenciesOf(context).database),
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         child: Stack(

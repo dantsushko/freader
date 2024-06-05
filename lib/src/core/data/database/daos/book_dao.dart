@@ -25,7 +25,8 @@ class BookWithMetadata {
 class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
   BookDao(super.db);
 
-  Future<void> importBook(BookMetadata metadata, String filePath) async {
+  Future<void> importBook(BookMetadata metadata, String filePath, int filesize) async {
+    print('importBooK: $filePath');
     final fileName = getFileName(filePath);
     l.i('importing book: $fileName');
     final existingBook =
@@ -35,19 +36,19 @@ class BookDao extends DatabaseAccessor<AppDatabase> with _$BookDaoMixin {
       return;
     }
     final dominantColors = DominantColor.get(metadata.cover);
+    final directoryParts = filePath.split('/')..removeLast();
     final newBook = BookEntriesCompanion.insert(
       timestamp: 0,
       filename: fileName,
       filepath: filePath,
       cover: Value(metadata.cover),
-      filesize: File(filePath).lengthSync(),
-      directory: Value(getDirName(filePath)),
+      filesize: filesize,
+      directory: Value(directoryParts.join('/')),
       format: metadata.format,
       coverDominantColor1: dominantColors.first.value,
       coverDominantColor2: dominantColors.last.value,
       coverFontColor: DominantColor.getReverseWhiteOrBlack(dominantColors.first).value,
     );
-
     final bid = await into(bookEntries).insert(newBook);
     final metaData = MetadataEntriesCompanion.insert(
       bid: bid,

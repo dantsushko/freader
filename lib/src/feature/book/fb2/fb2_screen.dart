@@ -255,7 +255,7 @@ class _FB2ScreenState extends State<FB2Screen> with AutomaticKeepAliveClientMixi
 
   Widget _buildFB2ElementWidget(FB2Element element) {
     if (element is FB2Image) {
-      return Image.memory(element.bytes);
+      return Align(child: Image.memory(element.bytes));
     }
     if (element is FB2Title) {
       return Align(
