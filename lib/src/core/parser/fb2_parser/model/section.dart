@@ -2,52 +2,54 @@ import 'package:collection/collection.dart';
 import 'package:freader/src/core/parser/fb2_parser/model/image.dart';
 import 'package:xml/xml.dart';
 
+import '../../../utils/hyphenator/hyphenator.dart';
 import 'element.dart';
 import 'link.dart';
 import 'title.dart';
 
-String split(String sentence, {String separator = '\u{00AD}'}) {
-  final words = sentence.split(' ');
-  final res = [];
-  for (final w in words) {
-    final prefixMatch = RegExp(r'^\p{P}+', unicode: true).firstMatch(w);
-    final wordMatch = RegExp(r'[^\p{P}\s]+', unicode: true).firstMatch(w);
-    final postfixMatch = RegExp(r'\p{P}+$', unicode: true).firstMatch(w);
+final h = Hyphenator(HyphenPattern.ru);
+// String split(String sentence, {String separator = '\u{00AD}'}) {
+//   final words = sentence.split(' ');
+//   final res = [];
+//   for (final w in words) {
+//     final prefixMatch = RegExp(r'^\p{P}+', unicode: true).firstMatch(w);
+//     final wordMatch = RegExp(r'[^\p{P}\s]+', unicode: true).firstMatch(w);
+//     final postfixMatch = RegExp(r'\p{P}+$', unicode: true).firstMatch(w);
 
-    final prefix = prefixMatch != null ? prefixMatch.group(0)! : '';
-    final word = wordMatch != null ? wordMatch.group(0)! : '';
-    final postfix = postfixMatch != null ? postfixMatch.group(0)! : '';
+//     final prefix = prefixMatch != null ? prefixMatch.group(0)! : '';
+//     final word = wordMatch != null ? wordMatch.group(0)! : '';
+//     final postfix = postfixMatch != null ? postfixMatch.group(0)! : '';
 
-    final splitted = splitWord(word).join(separator);
-    res.add('$prefix$splitted$postfix');
-  }
-  return res.join(' ');
-}
+//     final splitted = splitWord(word).join(separator);
+//     res.add('$prefix$splitted$postfix');
+//   }
+//   return res.join(' ');
+// }
 
-List<String> splitWord(String word) {
-  const vowels = 'аеёиоуыэюяАЕЁИОУЫЭЮЯ';
-  const appendage = 'йьъЙЬЪ';
-  const consonants = 'бвгджзйклмнпрстфхцчшщьъБВГДЖЗЙКЛМНПРСТФХЦЧШЩЬЪ';
-  const sonorants = 'лмнрЛМНР';
+// List<String> splitWord(String word) {
+//   const vowels = 'аеёиоуыэюяАЕЁИОУЫЭЮЯ';
+//   const appendage = 'йьъЙЬЪ';
+//   const consonants = 'бвгджзйклмнпрстфхцчшщьъБВГДЖЗЙКЛМНПРСТФХЦЧШЩЬЪ';
+//   const sonorants = 'лмнрЛМНР';
 
-  final syllableRegexp = RegExp('[$consonants]*[$vowels]([$consonants]*\$)?');
-  final syllables = syllableRegexp.allMatches(word).map((match) => match.group(0)!).toList();
-  for (var i = 1; i < syllables.length; i++) {
-    final match = RegExp('^[$consonants]*[$appendage]').firstMatch(syllables[i]);
-    if (match != null && syllables[i] != 'ться') {
-      syllables[i - 1] += match.group(0)!;
-      syllables[i] = syllables[i].substring(match.group(0)!.length);
-    } else if (sonorants.contains(syllables[i][0]) && !vowels.contains(syllables[i][1])) {
-      syllables[i - 1] += syllables[i][0];
-      syllables[i] = syllables[i].substring(1);
-    }
-  }
-  if (syllables.isEmpty) {
-    return [word];
-  }
+//   final syllableRegexp = RegExp('[$consonants]*[$vowels]([$consonants]*\$)?');
+//   final syllables = syllableRegexp.allMatches(word).map((match) => match.group(0)!).toList();
+//   for (var i = 1; i < syllables.length; i++) {
+//     final match = RegExp('^[$consonants]*[$appendage]').firstMatch(syllables[i]);
+//     if (match != null && syllables[i] != 'ться') {
+//       syllables[i - 1] += match.group(0)!;
+//       syllables[i] = syllables[i].substring(match.group(0)!.length);
+//     } else if (sonorants.contains(syllables[i][0]) && !vowels.contains(syllables[i][1])) {
+//       syllables[i - 1] += syllables[i][0];
+//       syllables[i] = syllables[i].substring(1);
+//     }
+//   }
+//   if (syllables.isEmpty) {
+//     return [word];
+//   }
 
-  return syllables;
-}
+//   return syllables;
+// }
 
 class FB2Text extends FB2Element {
   FB2Text(this.text, {this.emphasis = false});
@@ -67,7 +69,7 @@ class FB2Paragraph extends FB2Element {
     _elements.addAll(elements);
   }
 
-    List<FB2Paragraph> split(int splitIndex) {
+  List<FB2Paragraph> split(int splitIndex) {
     var currentIndex = 0;
     final firstPart = <FB2Element>[];
     final secondPart = <FB2Element>[];
@@ -80,15 +82,17 @@ class FB2Paragraph extends FB2Element {
       } else {
         final splitPoint = splitIndex - currentIndex;
         if (element is FB2Text) {
-          final firstText = FB2Text(element.text.substring(0, splitPoint), emphasis: element.emphasis);
-          final secondText = FB2Text(element.text.substring(splitPoint), emphasis: element.emphasis);
+          final firstText =
+              FB2Text(element.text.substring(0, splitPoint), emphasis: element.emphasis);
+          final secondText =
+              FB2Text(element.text.substring(splitPoint), emphasis: element.emphasis);
           firstPart.add(firstText);
           secondPart.add(secondText);
-        // } else if (element is FB2Link) {
-        //   var firstText = FB2Text(element.text.substring(0, splitPoint));
-        //   var secondText = FB2Text(element.text.substring(splitPoint));
-        //   firstPart.add(FB2Link.fromText(firstText, element.));
-        //   secondPart.add(FB2Link.fromText(secondText, element.href));
+          // } else if (element is FB2Link) {
+          //   var firstText = FB2Text(element.text.substring(0, splitPoint));
+          //   var secondText = FB2Text(element.text.substring(splitPoint));
+          //   firstPart.add(FB2Link.fromText(firstText, element.));
+          //   secondPart.add(FB2Link.fromText(secondText, element.href));
         }
       }
       currentIndex += element.text.length;
@@ -96,8 +100,8 @@ class FB2Paragraph extends FB2Element {
 
     return [FB2Paragraph(elements: firstPart), FB2Paragraph(elements: secondPart)];
   }
-
 }
+
 int findWordSplitIndex(String text) {
   for (var i = text.length - 1; i >= 0; i--) {
     if (RegExp(r'\w').hasMatch(text[i])) {
@@ -106,6 +110,7 @@ int findWordSplitIndex(String text) {
   }
   return -1;
 }
+
 int index = 0;
 
 class FB2Section {
@@ -151,7 +156,7 @@ class FB2Section {
         children.add(p);
       } else if (node.name.local == 'empty-line') {
         index++;
-        children.add(FB2EmtpyLine());
+        children.add(FB2EmptyLine());
       }
     }
   }

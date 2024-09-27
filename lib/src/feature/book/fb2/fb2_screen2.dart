@@ -560,4 +560,3 @@ class _FB2ScreenState extends State<FB2Screen> with AutomaticKeepAliveClientMixi
     return splitIndex;
   }
 }
-

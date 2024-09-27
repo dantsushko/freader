@@ -1,6 +1,5 @@
-
 abstract class FB2Element {
   String text = '';
 }
 
-class FB2EmtpyLine extends FB2Element {}
+class FB2EmptyLine extends FB2Element {}
